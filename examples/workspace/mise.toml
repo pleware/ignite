@@ -1,0 +1,8 @@
+# Example consumer pins. Copy to the workspace root as mise.toml.
+# Ignite plants mise, then `mise install` reads this file.
+
+[tools]
+go = "1.25.0"
+node = "22.12.0"
+python = "3.12.10"
+mani = "0.32.1"

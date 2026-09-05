@@ -1,0 +1,25 @@
+# Example consumer registry. Copy to the workspace root as mani.yaml.
+# Ignite clones entries with sync: true. path "." is the umbrella — skipped.
+
+sync_gitignore: false
+sync_remotes: false
+
+projects:
+  workspace:
+    path: .
+    url: https://example.com/workspace.git
+    desc: Umbrella
+    tags: [umbrella]
+    sync: false
+  product:
+    path: example-product
+    url: https://example.com/example-product.git
+    desc: Sample product
+    tags: [product, required]
+    sync: true
+  optional_ops:
+    path: example-ops
+    url: https://example.com/example-ops.git
+    desc: Sample optional sibling
+    tags: [ops]
+    sync: true

@@ -1,0 +1,3 @@
+# Portable ignite policy. Commit this file. No host paths.
+# Machine cache and working copy live in .ignite/ (gitignored).
+# Language pins: mise.toml. Services (Postgres, Redis, …) are Compose-only.

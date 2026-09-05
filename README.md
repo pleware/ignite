@@ -1,0 +1,79 @@
+# ignite
+
+Workspace toolchain bootstrapper. It plants [mise](https://mise.jdx.dev),
+then mise plants languages and [mani](https://github.com/alajmo/mani) from
+the consuming workspace's `mise.toml`. It is not OpenCode ([agentize](https://github.com/pleware/agentize)).
+
+This repository is the **kit**. A company workspace (binder, MassTrade,
+initagent, …) is the **consumer**. Ignite does not live inside that tree as
+a nested `*-developer` folder.
+
+Chicken-egg: first plant needs **git + curl** (Windows: Git Bash). Not
+system Go, Python, or Node. Mani and mise are outputs of bootstrap, not
+inputs.
+
+## Consumer layout
+
+Same shape as mise: a committed TOML at the workspace root, plus a local
+directory for the working copy.
+
+```text
+<workspace>/
+  mani.yaml              # repo registry (optional clones)
+  mise.toml              # language pins (mise)
+  ignite.toml            # ignite policy — commit this
+  .ignite/               # working copy / planted toolchain — gitignore this
+```
+
+Do not use `.mise.toml`, `.tool-versions`, `rtx.toml`, `.ignite.toml`,
+`ignite.yaml`, or `.settings.ignite.yaml`. Do not put `GIT_AUTHOR_*` in
+mise `[env]`.
+
+Example files: [`examples/workspace/`](examples/workspace/).
+
+## Bootstrap
+
+From the **workspace** (or pass its path):
+
+```sh
+sh /path/to/ignite/bootstrap.sh
+# or
+sh /path/to/ignite/bootstrap.sh /path/to/workspace
+```
+
+Windows PowerShell:
+
+```powershell
+.\bootstrap.ps1
+.\bootstrap.ps1 D:\path\to\workspace
+```
+
+Then:
+
+```sh
+eval "$(sh /path/to/ignite/env/env.sh)"
+mise --version
+mani --version
+```
+
+`.gitignore` on the consumer: `.ignite/` (the whole working copy). Policy
+stays in `ignite.toml`.
+
+## What v0 does
+
+1. Require `ignite.toml`. Cache is always `.ignite/`.
+2. Clone `mani.yaml` projects with `sync: true` (`required` tag fails hard).
+3. Plant the mise binary (`pins/toolchain.sh` → `PIN_MISE`).
+4. `mise trust` + `mise install` from `mise.toml`.
+
+Not in v0: Python `doctor` / `analyze` / TUI, git hooks, inspiration clones.
+Not in this kit: Docker, Postgres, or any service plant — Compose only, in
+the consumer tree.
+
+## Tests
+
+Git Bash / POSIX sh, from this repo:
+
+```sh
+sh tests/run.sh
+```
