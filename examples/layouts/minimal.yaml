@@ -1,0 +1,38 @@
+# Example layout pack. Copy and rename kinds — ignite has no built-in list.
+schema: ignite.layout/1
+
+kinds:
+  notes:
+    gitignore: deny-by-default
+    contains:
+      - leaf
+    markdown_allow:
+      - README.md
+    markdown_forbid:
+      - drafts/
+    gitignore_lines:
+      - "/*"
+      - "!/README.md"
+      - "!/notes/"
+      - "!/notes/**"
+    tree:
+      - path: README.md
+        plant: stub
+        from: stubs/README.md
+      - path: notes/
+        plant: dir
+      - path: drafts/
+        plant: absent
+
+  leaf:
+    gitignore: allow-by-default
+    markdown_forbid:
+      - drafts/
+    gitignore_lines:
+      - /drafts/
+    tree:
+      - path: README.md
+        plant: stub
+        from: stubs/README.md
+      - path: drafts/
+        plant: absent

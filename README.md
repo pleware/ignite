@@ -19,10 +19,11 @@ directory for the working copy.
 
 ```text
 <workspace>/
-  mani.yaml              # repo registry (optional clones)
-  mise.toml              # language pins (mise)
-  ignite.toml            # ignite policy — commit this
-  .ignite/               # working copy / planted toolchain — gitignore this
+  mani.yaml                 # repo registry (optional clones)
+  mise.toml                 # language pins (mise)
+  ignite.toml               # ignite policy — commit this
+  workspace-layout.yaml     # optional layout document (kinds are data)
+  .ignite/                  # working copy / planted toolchain — gitignore this
 ```
 
 Do not use `.mise.toml`, `.tool-versions`, `rtx.toml`, `.ignite.toml`,
@@ -59,16 +60,44 @@ mani --version
 `.gitignore` on the consumer: `.ignite/` (the whole working copy). Policy
 stays in `ignite.toml`.
 
+## Layout
+
+Ignite does not ship binder / workspace / product profiles. It implements
+verbs from schema [`schema/layout.v1.json`](schema/layout.v1.json)
+(`ignite.layout/1`): `dir`, `stub`, `absent`. Kinds are names in a YAML
+document the consumer writes. Anyone can ship their own file.
+
+```toml
+# ignite.toml
+[layout]
+file = "workspace-layout.yaml"
+kind = "notes"
+```
+
+```sh
+sh /path/to/ignite/layout.sh analyze
+sh /path/to/ignite/layout.sh init --kind leaf --dest ./app
+# or without ignite.toml:
+sh /path/to/ignite/layout.sh analyze --layout ./workspace-layout.yaml --kind notes --dest .
+```
+
+Windows: `.\layout.ps1` with the same arguments.
+
+A generic pack: [`examples/layouts/minimal.yaml`](examples/layouts/minimal.yaml).
+Schema id: `ignite.layout/1`.
+
 ## What v0 does
 
 1. Require `ignite.toml`. Cache is always `.ignite/`.
 2. Clone `mani.yaml` projects with `sync: true` (`required` tag fails hard).
 3. Plant the mise binary (`pins/toolchain.sh` → `PIN_MISE`).
 4. `mise trust` + `mise install` from `mise.toml`.
+5. `layout.sh analyze` / `init` against a consumer layout document.
 
-Not in v0: Python `doctor` / `analyze` / TUI, git hooks, inspiration clones.
-Not in this kit: Docker, Postgres, or any service plant — Compose only, in
-the consumer tree.
+Not in v0: Python `doctor` / TUI, git hooks, inspiration clones.
+Not in this kit: Docker, Postgres, Redis, LiteLLM, or any service plant.
+Local containers are Compose-only in the consumer tree. LiteLLM is hosted
+externally — ignite does not plant a proxy.
 
 ## Tests
 

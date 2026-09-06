@@ -14,15 +14,21 @@ ignite/                          # this repository
 ├── LAYOUT.md
 ├── bootstrap.sh                 # git + curl → mise → mise install
 ├── bootstrap.ps1                # Windows: Git Bash wrapper
+├── layout.sh                    # analyze / init a consumer layout YAML
+├── layout.ps1
+├── schema/layout.v1.json        # ignite.layout/1 — verbs, not kinds
 ├── pins/
 │   ├── toolchain.sh             # PIN_MISE only
 │   ├── resolve-workspace.sh     # cwd / $1 / IGNITE_WORKSPACE
 │   ├── read-ignite-toml.sh      # ignite.toml
 │   ├── read-mani.sh             # mani.yaml clone targets
-│   └── workspace-paths.sh       # .ignite/ (or IGNITE_TOOLCHAIN_ROOT)
+│   ├── workspace-paths.sh       # .ignite/ (or IGNITE_TOOLCHAIN_ROOT)
+│   ├── read-layout.sh           # ignite.layout/1 YAML → directory dump
+│   └── layout-apply.sh          # analyze / init
 ├── env/
 │   └── env.sh                   # eval-able PATH / MISE_DATA_DIR / GOCACHE
 ├── examples/workspace/          # copy these files to a consumer
+├── examples/layouts/            # generic layout pack (not pware kinds)
 └── tests/
 ```
 

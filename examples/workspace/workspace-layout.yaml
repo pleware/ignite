@@ -1,0 +1,30 @@
+# Consumer copy. Point ignite.toml [layout] file here.
+schema: ignite.layout/1
+
+kinds:
+  notes:
+    gitignore: deny-by-default
+    contains:
+      - leaf
+    gitignore_lines:
+      - "/*"
+      - "!/README.md"
+      - "!/notes/"
+      - "!/notes/**"
+    tree:
+      - path: README.md
+        plant: stub
+      - path: notes/
+        plant: dir
+      - path: drafts/
+        plant: absent
+
+  leaf:
+    gitignore: allow-by-default
+    gitignore_lines:
+      - /drafts/
+    tree:
+      - path: README.md
+        plant: stub
+      - path: drafts/
+        plant: absent

@@ -1,0 +1,76 @@
+{
+  "$schema": "https://json-schema.org/draft-07/schema#",
+  "$id": "https://pleware.dev/ignite/layout/v1",
+  "title": "ignite.layout/1",
+  "description": "A layout document. Ignite knows verbs (dir, stub, absent), not kinds. Kinds are data in this file.",
+  "type": "object",
+  "required": ["schema", "kinds"],
+  "additionalProperties": false,
+  "properties": {
+    "schema": {
+      "const": "ignite.layout/1"
+    },
+    "kinds": {
+      "type": "object",
+      "minProperties": 1,
+      "additionalProperties": {
+        "$ref": "#/definitions/kind"
+      }
+    }
+  },
+  "definitions": {
+    "kind": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "gitignore": {
+          "enum": ["deny-by-default", "allow-by-default"]
+        },
+        "contains": {
+          "type": "array",
+          "items": { "type": "string", "pattern": "^[A-Za-z][A-Za-z0-9_-]*$" }
+        },
+        "markdown_allow": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 }
+        },
+        "markdown_forbid": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 }
+        },
+        "gitignore_lines": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 }
+        },
+        "tree": {
+          "type": "array",
+          "items": { "$ref": "#/definitions/treeItem" }
+        }
+      }
+    },
+    "treeItem": {
+      "type": "object",
+      "required": ["path", "plant"],
+      "additionalProperties": false,
+      "properties": {
+        "path": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Relative path. No leading slash. No .. components."
+        },
+        "plant": {
+          "enum": ["dir", "stub", "absent"]
+        },
+        "from": {
+          "type": "string",
+          "description": "Stub source, relative to the layout file directory."
+        },
+        "required": {
+          "type": "boolean",
+          "default": true,
+          "description": "analyze fails when missing. init still plants."
+        }
+      }
+    }
+  }
+}

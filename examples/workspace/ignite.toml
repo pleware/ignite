@@ -1,3 +1,10 @@
 # Portable ignite policy. Commit this file. No host paths.
 # Machine cache and working copy live in .ignite/ (gitignored).
-# Language pins: mise.toml. Services (Postgres, Redis, …) are Compose-only.
+# Language pins: mise.toml.
+# Postgres/Redis: Compose in the consumer tree. LiteLLM: hosted externally.
+#
+# Layout is a document, not a kit profile. Kinds live in the YAML.
+
+[layout]
+file = "workspace-layout.yaml"
+kind = "notes"
