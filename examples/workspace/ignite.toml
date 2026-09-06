@@ -5,6 +5,6 @@
 #
 # Layout is a document, not a kit profile. Kinds live in the YAML.
 
-[layout]
+[workspace-tree]
 file = "workspace-layout.yaml"
 kind = "notes"

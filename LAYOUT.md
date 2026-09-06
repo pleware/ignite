@@ -1,4 +1,4 @@
-# Layout
+# Kit tree
 
 Two trees. Do not mix them.
 
@@ -8,27 +8,33 @@ Two trees. Do not mix them.
    other local files on *this* machine. Gitignored. Policy is `ignite.toml`
    at the workspace root, not a file inside `.ignite/`.
 
+The **workspace tree** is a third thing: a consumer YAML of directory kinds
+(`workspace-tree.sh`, schema `ignite.workspace-tree/1`). It is not this kit
+tree and not `.ignite/`.
+
 ```
 ignite/                          # this repository
 ├── README.md
 ├── LAYOUT.md
 ├── bootstrap.sh                 # git + curl → mise → mise install
 ├── bootstrap.ps1                # Windows: Git Bash wrapper
-├── layout.sh                    # analyze / init a consumer layout YAML
-├── layout.ps1
-├── schema/layout.v1.json        # ignite.layout/1 — verbs, not kinds
+├── workspace-tree.sh            # analyze / init a consumer kind YAML
+├── workspace-tree.ps1
+├── layout.sh                    # alias → workspace-tree.sh
+├── layout.ps1                   # alias → workspace-tree.ps1
+├── schema/layout.v1.json        # ignite.workspace-tree/1 — verbs, not kinds
 ├── pins/
 │   ├── toolchain.sh             # PIN_MISE only
 │   ├── resolve-workspace.sh     # cwd / $1 / IGNITE_WORKSPACE
 │   ├── read-ignite-toml.sh      # ignite.toml
 │   ├── read-mani.sh             # mani.yaml clone targets
 │   ├── workspace-paths.sh       # .ignite/ (or IGNITE_TOOLCHAIN_ROOT)
-│   ├── read-layout.sh           # ignite.layout/1 YAML → directory dump
+│   ├── read-layout.sh           # workspace-tree YAML → directory dump
 │   └── layout-apply.sh          # analyze / init
 ├── env/
 │   └── env.sh                   # eval-able PATH / MISE_DATA_DIR / GOCACHE
 ├── examples/workspace/          # copy these files to a consumer
-├── examples/layouts/            # generic layout pack (not pware kinds)
+├── examples/layouts/            # generic kind pack (not pware kinds)
 └── tests/
 ```
 

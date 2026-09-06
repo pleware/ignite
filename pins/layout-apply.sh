@@ -21,8 +21,8 @@ layout_kind_dir() {
 
 layout_require_kind() {
 	if [ ! -d "$(layout_kind_dir "$1")" ]; then
-		echo "ignite layout: unknown kind '$1'" >&2
-		echo "ignite layout: kinds:" >&2
+		echo "ignite workspace-tree: unknown kind '$1'" >&2
+		echo "ignite workspace-tree: kinds:" >&2
 		sed 's/^/  /' "$LAYOUT_DIR/kinds" >&2
 		return 1
 	fi
@@ -69,19 +69,19 @@ layout_copy_stub() {
 		return 0
 	fi
 	if ! layout_rel_ok "$_from"; then
-		echo "ignite layout: bad from: $_from" >&2
+		echo "ignite workspace-tree: bad from: $_from" >&2
 		return 1
 	fi
 	_src="$_pack/$_from"
 	if [ ! -f "$_src" ]; then
-		echo "ignite layout: stub missing: $_src" >&2
+		echo "ignite workspace-tree: stub missing: $_src" >&2
 		return 1
 	fi
 	# Keep the copy inside the pack (no .. after join).
 	case "$_src" in
 	"$_pack"/*) ;;
 	*)
-		echo "ignite layout: from escapes pack: $_from" >&2
+		echo "ignite workspace-tree: from escapes pack: $_from" >&2
 		return 1
 		;;
 	esac
@@ -105,7 +105,7 @@ layout_analyze() {
 				_req=$(cat "$_item/required")
 			fi
 			if ! layout_rel_ok "$_path"; then
-				echo "ignite layout: bad path: $_path" >&2
+				echo "ignite workspace-tree: bad path: $_path" >&2
 				_fail=1
 				continue
 			fi
@@ -113,24 +113,24 @@ layout_analyze() {
 			case "$_plant" in
 			dir)
 				if [ "$_req" = true ] && [ ! -d "$_target" ]; then
-					echo "ignite layout: missing dir $_path" >&2
+					echo "ignite workspace-tree: missing dir $_path" >&2
 					_fail=1
 				fi
 				;;
 			stub)
 				if [ "$_req" = true ] && [ ! -f "$_target" ]; then
-					echo "ignite layout: missing file $_path" >&2
+					echo "ignite workspace-tree: missing file $_path" >&2
 					_fail=1
 				fi
 				;;
 			absent)
 				if [ -e "$_target" ]; then
-					echo "ignite layout: path should be absent: $_path" >&2
+					echo "ignite workspace-tree: path should be absent: $_path" >&2
 					_fail=1
 				fi
 				;;
 			*)
-				echo "ignite layout: unknown plant $_plant" >&2
+				echo "ignite workspace-tree: unknown plant $_plant" >&2
 				_fail=1
 				;;
 			esac
@@ -142,12 +142,12 @@ layout_analyze() {
 		while IFS= read -r _line || [ -n "$_line" ]; do
 			[ -n "$_line" ] || continue
 			if ! layout_rel_ok "$_line"; then
-				echo "ignite layout: bad markdown_forbid: $_line" >&2
+				echo "ignite workspace-tree: bad markdown_forbid: $_line" >&2
 				_fail=1
 				continue
 			fi
 			if [ -e "$_root/$_line" ]; then
-				echo "ignite layout: forbidden path exists: $_line" >&2
+				echo "ignite workspace-tree: forbidden path exists: $_line" >&2
 				_fail=1
 			fi
 		done <"$_kd/markdown_forbid"
@@ -158,7 +158,7 @@ layout_analyze() {
 		_mode=$(cat "$_kd/gitignore")
 		if [ "$_mode" = deny-by-default ]; then
 			if ! layout_gitignore_has_line "$_gi" "/*"; then
-				echo "ignite layout: deny-by-default needs a /* line in .gitignore" >&2
+				echo "ignite workspace-tree: deny-by-default needs a /* line in .gitignore" >&2
 				_fail=1
 			fi
 		fi
@@ -168,7 +168,7 @@ layout_analyze() {
 		while IFS= read -r _line || [ -n "$_line" ]; do
 			[ -n "$_line" ] || continue
 			if ! layout_gitignore_has_line "$_gi" "$_line"; then
-				echo "ignite layout: .gitignore missing line: $_line" >&2
+				echo "ignite workspace-tree: .gitignore missing line: $_line" >&2
 				_fail=1
 			fi
 		done <"$_kd/gitignore_lines"
@@ -177,7 +177,7 @@ layout_analyze() {
 	if [ "$_fail" -ne 0 ]; then
 		return 1
 	fi
-	echo "ignite layout: analyze ok ($_kind @ $_root)"
+	echo "ignite workspace-tree: analyze ok ($_kind @ $_root)"
 }
 
 layout_init() {
@@ -198,7 +198,7 @@ layout_init() {
 				_from=$(cat "$_item/from")
 			fi
 			if ! layout_rel_ok "$_path"; then
-				echo "ignite layout: bad path: $_path" >&2
+				echo "ignite workspace-tree: bad path: $_path" >&2
 				return 1
 			fi
 			_target="$_root/$_path"
@@ -215,7 +215,7 @@ layout_init() {
 			absent)
 				;;
 			*)
-				echo "ignite layout: unknown plant $_plant" >&2
+				echo "ignite workspace-tree: unknown plant $_plant" >&2
 				return 1
 				;;
 			esac
@@ -251,5 +251,5 @@ layout_init() {
 	if [ "$_need_gi" -eq 1 ]; then
 		:
 	fi
-	echo "ignite layout: init ok ($_kind @ $_root)"
+	echo "ignite workspace-tree: init ok ($_kind @ $_root)"
 }

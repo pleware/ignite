@@ -12,6 +12,11 @@ trap 'rm -rf "$tmp"' EXIT
 parse_layout_to_dir "$KIT/examples/layouts/minimal.yaml" "$tmp"
 
 test "$(cat "$tmp/schema")" = "ignite.layout/1"
+
+# Canonical schema id.
+tmp2=$(mktemp -d)
+parse_layout_to_dir "$KIT/examples/workspace/workspace-layout.yaml" "$tmp2"
+test "$(cat "$tmp2/schema")" = "ignite.workspace-tree/1"
 test "$(tr '\n' ' ' <"$tmp/kinds" | sed 's/ $//')" = "notes leaf"
 
 test "$(cat "$tmp/kind/notes/gitignore")" = "deny-by-default"

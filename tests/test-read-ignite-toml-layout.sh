@@ -1,5 +1,5 @@
 #!/bin/sh
-# [layout] file / kind from ignite.toml. Comments-only stays empty.
+# [workspace-tree] file / kind from ignite.toml. [layout] is still accepted.
 set -eu
 
 KIT=$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)
@@ -21,5 +21,16 @@ load_ignite_config
 load_layout_policy
 test -z "${LAYOUT_FILE:-}"
 test -z "${LAYOUT_KIND:-}"
+
+printf '%s\n' '[layout]' 'file = "old-name.yaml"' 'kind = "leaf"' >"$tmp/ignite.toml"
+load_layout_policy
+test "$LAYOUT_FILE" = "old-name.yaml"
+test "$LAYOUT_KIND" = "leaf"
+
+printf '%s\n' '[layout]' 'file = "old-name.yaml"' 'kind = "leaf"' \
+	'[workspace-tree]' 'file = "new-name.yaml"' 'kind = "notes"' >"$tmp/ignite.toml"
+load_layout_policy
+test "$LAYOUT_FILE" = "new-name.yaml"
+test "$LAYOUT_KIND" = "notes"
 
 echo "read-ignite-toml-layout: ok"

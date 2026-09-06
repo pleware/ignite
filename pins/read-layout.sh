@@ -1,4 +1,5 @@
-# POSIX helpers: parse an ignite.layout/1 YAML document into a directory.
+# POSIX helpers: parse an ignite.workspace-tree/1 YAML document into a directory.
+# ignite.layout/1 is still accepted.
 # No YAML library — same constraint as read-mani.sh (bootstrap before Python).
 # Supported subset: block keys, 2-space indent, quoted or bare scalars.
 # Block scalars, flow maps, and tags other than quoted "!" lines are out.
@@ -9,7 +10,7 @@ parse_layout_to_dir() {
 	_yaml=$1
 	_out=$2
 	if [ ! -f "$_yaml" ]; then
-		echo "ignite layout: missing $_yaml" >&2
+		echo "ignite workspace-tree: missing $_yaml" >&2
 		return 1
 	fi
 	mkdir -p "$_out"
@@ -31,7 +32,7 @@ parse_layout_to_dir() {
 			cmd = "mkdir -p \"" p "\""
 			rc = system(cmd)
 			if (rc != 0) {
-				print "ignite layout: mkdir failed: " p > "/dev/stderr"
+				print "ignite workspace-tree: mkdir failed: " p > "/dev/stderr"
 				exit 1
 			}
 		}
@@ -55,7 +56,7 @@ parse_layout_to_dir() {
 				return
 			}
 			if (item_plant == "") {
-				print "ignite layout: tree item missing plant: " item_path > "/dev/stderr"
+				print "ignite workspace-tree: tree item missing plant: " item_path > "/dev/stderr"
 				exit 1
 			}
 			d = out "/kind/" kind "/tree/" sprintf("%03d", tree_n)
@@ -74,7 +75,7 @@ parse_layout_to_dir() {
 		function start_kind(name) {
 			finish_tree_item()
 			if (name !~ /^[A-Za-z][A-Za-z0-9_-]*$/) {
-				print "ignite layout: bad kind name: " name > "/dev/stderr"
+				print "ignite workspace-tree: bad kind name: " name > "/dev/stderr"
 				exit 1
 			}
 			kind = name
@@ -120,7 +121,7 @@ parse_layout_to_dir() {
 			finish_tree_item()
 			val = unquote(substr(line, index(line, ":") + 1))
 			if (val != "deny-by-default" && val != "allow-by-default") {
-				print "ignite layout: gitignore must be deny-by-default or allow-by-default" > "/dev/stderr"
+				print "ignite workspace-tree: gitignore must be deny-by-default or allow-by-default" > "/dev/stderr"
 				exit 1
 			}
 			write_file(out "/kind/" kind "/gitignore", val)
@@ -184,7 +185,7 @@ parse_layout_to_dir() {
 		in_tree && line ~ /^        plant:[[:space:]]*/ {
 			item_plant = unquote(substr(line, index(line, ":") + 1))
 			if (item_plant != "dir" && item_plant != "stub" && item_plant != "absent") {
-				print "ignite layout: plant must be dir, stub, or absent" > "/dev/stderr"
+				print "ignite workspace-tree: plant must be dir, stub, or absent" > "/dev/stderr"
 				exit 1
 			}
 			next
@@ -203,17 +204,17 @@ parse_layout_to_dir() {
 			next
 		}
 		{
-			print "ignite layout: unsupported line: " line > "/dev/stderr"
+			print "ignite workspace-tree: unsupported line: " line > "/dev/stderr"
 			exit 1
 		}
 		END {
 			finish_tree_item()
-			if (schema != "ignite.layout/1") {
-				print "ignite layout: schema must be ignite.layout/1 (got \"" schema "\")" > "/dev/stderr"
+			if (schema != "ignite.workspace-tree/1" && schema != "ignite.layout/1") {
+				print "ignite workspace-tree: schema must be ignite.workspace-tree/1 (or ignite.layout/1; got \"" schema "\")" > "/dev/stderr"
 				exit 1
 			}
 			if (kinds == "") {
-				print "ignite layout: no kinds" > "/dev/stderr"
+				print "ignite workspace-tree: no kinds" > "/dev/stderr"
 				exit 1
 			}
 			write_file(out "/schema", schema)

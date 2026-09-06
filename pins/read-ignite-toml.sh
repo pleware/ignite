@@ -1,6 +1,6 @@
 # POSIX helpers: require <workspace>/ignite.toml.
 # Requires WORKSPACE_ROOT. File may be comments-only.
-# Optional [layout] file / kind — kinds are not built into the kit.
+# Optional [workspace-tree] (or [layout]) file / kind — kinds are not built into the kit.
 
 _ignite_toml_path() {
 	printf '%s\n' "$WORKSPACE_ROOT/ignite.toml"
@@ -15,10 +15,15 @@ load_ignite_config() {
 }
 
 # Sets LAYOUT_FILE, LAYOUT_KIND, LAYOUT_KIND_FROM_TOML (empty when absent).
+# [workspace-tree] wins when both that and [layout] are present.
 load_layout_policy() {
 	LAYOUT_FILE=
 	LAYOUT_KIND=
 	LAYOUT_KIND_FROM_TOML=
+	TREE_FILE=
+	TREE_KIND=
+	ALIAS_FILE=
+	ALIAS_KIND=
 	config=$(_ignite_toml_path)
 	if [ ! -f "$config" ]; then
 		return 0
@@ -39,7 +44,7 @@ load_layout_policy() {
 				}
 				return s
 			}
-			BEGIN { in_layout = 0 }
+			BEGIN { section = "" }
 			{
 				line = $0
 				gsub(/\r/, "", line)
@@ -48,26 +53,51 @@ load_layout_policy() {
 					next
 				}
 				if (t ~ /^\[/) {
-					in_layout = (t == "[layout]")
+					if (t == "[workspace-tree]") {
+						section = "tree"
+					} else if (t == "[layout]") {
+						section = "alias"
+					} else {
+						section = ""
+					}
 					next
 				}
-				if (!in_layout) {
+				if (section == "") {
 					next
 				}
 				if (t ~ /^file[[:space:]]*=/) {
 					val = t
 					sub(/^file[[:space:]]*=[[:space:]]*/, "", val)
-					printf "LAYOUT_FILE=%s\n", unquote(val)
+					if (section == "tree") {
+						printf "TREE_FILE=%s\n", unquote(val)
+					} else {
+						printf "ALIAS_FILE=%s\n", unquote(val)
+					}
 					next
 				}
 				if (t ~ /^kind[[:space:]]*=/) {
 					val = t
 					sub(/^kind[[:space:]]*=[[:space:]]*/, "", val)
-					printf "LAYOUT_KIND=%s\n", unquote(val)
-					printf "LAYOUT_KIND_FROM_TOML=%s\n", unquote(val)
+					if (section == "tree") {
+						printf "TREE_KIND=%s\n", unquote(val)
+					} else {
+						printf "ALIAS_KIND=%s\n", unquote(val)
+					}
 					next
 				}
 			}
 		' "$config"
 	)"
+	if [ -n "${TREE_FILE:-}" ]; then
+		LAYOUT_FILE=$TREE_FILE
+	elif [ -n "${ALIAS_FILE:-}" ]; then
+		LAYOUT_FILE=$ALIAS_FILE
+	fi
+	if [ -n "${TREE_KIND:-}" ]; then
+		LAYOUT_KIND=$TREE_KIND
+		LAYOUT_KIND_FROM_TOML=$TREE_KIND
+	elif [ -n "${ALIAS_KIND:-}" ]; then
+		LAYOUT_KIND=$ALIAS_KIND
+		LAYOUT_KIND_FROM_TOML=$ALIAS_KIND
+	fi
 }

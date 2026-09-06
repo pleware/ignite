@@ -7,8 +7,8 @@ KIT=$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)
 tmp=$(mktemp -d)
 trap 'rm -rf "$tmp"' EXIT
 
-sh "$KIT/layout.sh" init \
-	--layout "$KIT/examples/layouts/minimal.yaml" \
+sh "$KIT/workspace-tree.sh" init \
+	--tree "$KIT/examples/layouts/minimal.yaml" \
 	--kind notes \
 	--dest "$tmp/ws"
 

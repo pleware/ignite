@@ -1,5 +1,6 @@
-# Consumer copy. Point ignite.toml [layout] file here.
-schema: ignite.layout/1
+# Consumer copy. Point ignite.toml [workspace-tree] file here.
+# ignite.layout/1 is still accepted.
+schema: ignite.workspace-tree/1
 
 kinds:
   notes:

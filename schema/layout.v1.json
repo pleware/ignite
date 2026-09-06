@@ -1,14 +1,14 @@
 {
   "$schema": "https://json-schema.org/draft-07/schema#",
-  "$id": "https://pleware.dev/ignite/layout/v1",
-  "title": "ignite.layout/1",
-  "description": "A layout document. Ignite knows verbs (dir, stub, absent), not kinds. Kinds are data in this file.",
+  "$id": "https://pleware.dev/ignite/workspace-tree/v1",
+  "title": "ignite.workspace-tree/1",
+  "description": "A workspace-tree document. Ignite knows verbs (dir, stub, absent), not kinds. Kinds are data in this file. The schema id ignite.layout/1 is still accepted.",
   "type": "object",
   "required": ["schema", "kinds"],
   "additionalProperties": false,
   "properties": {
     "schema": {
-      "const": "ignite.layout/1"
+      "enum": ["ignite.workspace-tree/1", "ignite.layout/1"]
     },
     "kinds": {
       "type": "object",
@@ -63,7 +63,7 @@
         },
         "from": {
           "type": "string",
-          "description": "Stub source, relative to the layout file directory."
+          "description": "Stub source, relative to the workspace-tree file directory."
         },
         "required": {
           "type": "boolean",

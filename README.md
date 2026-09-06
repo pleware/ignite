@@ -22,7 +22,7 @@ directory for the working copy.
   mani.yaml                 # repo registry (optional clones)
   mise.toml                 # language pins (mise)
   ignite.toml               # ignite policy — commit this
-  workspace-layout.yaml     # optional layout document (kinds are data)
+  workspace-layout.yaml     # optional workspace-tree document (kinds are data)
   .ignite/                  # working copy / planted toolchain — gitignore this
 ```
 
@@ -60,31 +60,34 @@ mani --version
 `.gitignore` on the consumer: `.ignite/` (the whole working copy). Policy
 stays in `ignite.toml`.
 
-## Layout
+## Workspace tree
 
 Ignite does not ship binder / workspace / product profiles. It implements
 verbs from schema [`schema/layout.v1.json`](schema/layout.v1.json)
-(`ignite.layout/1`): `dir`, `stub`, `absent`. Kinds are names in a YAML
-document the consumer writes. Anyone can ship their own file.
+(`ignite.workspace-tree/1`): `dir`, `stub`, `absent`. Kinds are names in a
+YAML document the consumer writes. Anyone can ship their own file.
+
+`ignite.layout/1`, `[layout]`, `--layout`, and `layout.sh` are aliases.
 
 ```toml
 # ignite.toml
-[layout]
+[workspace-tree]
 file = "workspace-layout.yaml"
 kind = "notes"
 ```
 
 ```sh
-sh /path/to/ignite/layout.sh analyze
-sh /path/to/ignite/layout.sh init --kind leaf --dest ./app
+sh /path/to/ignite/workspace-tree.sh analyze
+sh /path/to/ignite/workspace-tree.sh init --kind leaf --dest ./app
 # or without ignite.toml:
-sh /path/to/ignite/layout.sh analyze --layout ./workspace-layout.yaml --kind notes --dest .
+sh /path/to/ignite/workspace-tree.sh analyze --tree ./workspace-layout.yaml --kind notes --dest .
 ```
 
-Windows: `.\layout.ps1` with the same arguments.
+Windows: `.\workspace-tree.ps1` with the same arguments.
 
-A generic pack: [`examples/layouts/minimal.yaml`](examples/layouts/minimal.yaml).
-Schema id: `ignite.layout/1`.
+A generic pack: [`examples/layouts/minimal.yaml`](examples/layouts/minimal.yaml)
+(still uses the `ignite.layout/1` alias). Canonical id:
+`ignite.workspace-tree/1`.
 
 ## What v0 does
 
@@ -92,7 +95,7 @@ Schema id: `ignite.layout/1`.
 2. Clone `mani.yaml` projects with `sync: true` (`required` tag fails hard).
 3. Plant the mise binary (`pins/toolchain.sh` → `PIN_MISE`).
 4. `mise trust` + `mise install` from `mise.toml`.
-5. `layout.sh analyze` / `init` against a consumer layout document.
+5. `workspace-tree.sh analyze` / `init` against a consumer kind document.
 
 Not in v0: Python `doctor` / TUI, git hooks, inspiration clones.
 Not in this kit: Docker, Postgres, Redis, LiteLLM, or any service plant.
