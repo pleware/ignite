@@ -1,5 +1,9 @@
 # ignite
 
+[![CI](https://github.com/pleware/ignite/actions/workflows/ci.yml/badge.svg)](https://github.com/pleware/ignite/actions/workflows/ci.yml)
+[![codecov](https://codecov.io/gh/pleware/ignite/branch/main/graph/badge.svg)](https://codecov.io/gh/pleware/ignite)
+[![License](https://img.shields.io/badge/license-MIT-lightgrey?style=flat-square)](LICENSE)
+
 Workspace toolchain bootstrapper. It plants [mise](https://mise.jdx.dev),
 then mise plants languages and [mani](https://github.com/alajmo/mani) from
 the consuming workspace's `mise.toml`. It is not OpenCode ([agentize](https://github.com/pleware/agentize)).

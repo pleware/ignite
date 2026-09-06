@@ -1,0 +1,16 @@
+# Publish a number. Do not fail PRs on coverage — this is POSIX sh under kcov.
+coverage:
+  status:
+    project:
+      default:
+        informational: true
+    patch:
+      default:
+        informational: true
+
+comment: false
+
+ignore:
+  - "tests/**"
+  - "examples/**"
+  - "*.ps1"
