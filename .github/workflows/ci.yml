@@ -38,5 +38,5 @@ jobs:
         uses: codecov/codecov-action@v5
         with:
           files: coverage/cobertura.xml
-          fail_ci_if_error: false
+          fail_ci_if_error: true
           use_oidc: true
