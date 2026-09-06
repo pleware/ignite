@@ -8,7 +8,8 @@ on:
 jobs:
   test:
     name: Kit tests + coverage
-    runs-on: ubuntu-latest
+    # kcov is not in Ubuntu 24.04 apt. 22.04 still ships it (until 2027).
+    runs-on: ubuntu-22.04
     permissions:
       id-token: write
       contents: read
