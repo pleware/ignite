@@ -22,11 +22,10 @@ jobs:
       - name: Tests under kcov
         run: sh tests/coverage.sh
 
-      - name: Flatten cobertura for Codecov
+      - name: Check cobertura
         run: |
-          f=$(find coverage -name cobertura.xml | head -n 1)
-          test -n "$f"
-          cp "$f" coverage/cobertura.xml
+          test -f coverage/cobertura.xml
+          grep -q 'lines-valid="[1-9]' coverage/cobertura.xml
 
       - name: Upload coverage artifact
         uses: actions/upload-artifact@v4

@@ -14,15 +14,23 @@ fi
 rm -rf "$OUT"
 mkdir -p "$OUT"
 
+# The first command must be the script file. `kcov out bash tests/run.sh`
+# traces the bash ELF (0 lines after --include-path) and Codecov stays at 0%.
 kcov \
 	--include-path="$ROOT" \
 	--exclude-pattern=/tests/,/examples/ \
 	--bash-handle-sh-invocation \
+	--bash-parse-files-in-dir="$ROOT" \
 	"$OUT" \
-	bash "$ROOT/tests/run.sh"
+	"$ROOT/tests/run.sh"
 
-if ! find "$OUT" -name cobertura.xml -print -quit | grep -q .; then
-	echo "coverage.sh: kcov wrote no cobertura.xml under $OUT" >&2
+xml=$OUT/cobertura.xml
+if [ ! -f "$xml" ]; then
+	echo "coverage.sh: kcov wrote no $xml" >&2
+	exit 1
+fi
+if ! grep -q 'lines-valid="[1-9]' "$xml"; then
+	echo "coverage.sh: kcov reported zero kit lines (empty cobertura)" >&2
 	exit 1
 fi
 
