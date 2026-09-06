@@ -19,8 +19,8 @@ Postgres and Redis may run in the consumer's **Compose** (Horizon, infra-dev,
 tests). LiteLLM is hosted externally (URL + credentials) — not Compose, not
 a toolchain binary.
 
-Intelephense is not an ignite plant. PHP products pin it in **their**
-`mise.toml` (MassTrade: ERP, B2B hub, image workers).
+Intelephense and PHPantom are not ignite plants. PHP products pin them in
+**their** `mise.toml`. Agentize only names the command in `agentize.yaml`.
 
 Graphify is a consumer pin (`pipx:graphifyy` in `mise.toml`), not an ignite
 plant. Every product that uses the kit should pin it.
