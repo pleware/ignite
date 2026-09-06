@@ -1,6 +1,6 @@
 #!/bin/sh
 # Clone siblings from mani.yaml, plant mise, then `mise install` from mise.toml.
-# Cache lands in .ignite/. Databases are not part of this toolchain.
+# Cache lands in .ignite/. Databases and LiteLLM are not part of this toolchain.
 # POSIX sh: Git Bash (Windows), macOS bash 3.2, Ubuntu dash/sh.
 #
 # This kit is a separate git repo. The workspace is cwd, $1, or IGNITE_WORKSPACE.
