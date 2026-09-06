@@ -6,7 +6,9 @@ Commit product files here. Do not commit consuming workspaces
 (`my-developer-workspace`, `initagent-workspace`, MassTrade) from this tree.
 
 Language pins belong in the consumer `mise.toml`. Ignite policy belongs in
-`ignite.toml`. Do not put either inside `.ignite/`.
+`ignite.toml`. Do not put either inside `.ignite/`. Optional `[kit] pin`
+(and `url`) is the git ref a consumer or agentize clones when the kit is
+missing on this machine. Do not float `main` on a fleet — pin a commit.
 
 Workspace-tree kinds are not part of this kit. The engine is
 `workspace-tree.sh` plus `schema/layout.v1.json`. A consumer commits its

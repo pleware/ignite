@@ -7,6 +7,7 @@ fail=0
 for t in \
 	"$ROOT/test-read-ignite-toml.sh" \
 	"$ROOT/test-read-ignite-toml-layout.sh" \
+	"$ROOT/test-read-ignite-toml-kit.sh" \
 	"$ROOT/test-read-mani.sh" \
 	"$ROOT/test-resolve-workspace.sh" \
 	"$ROOT/test-bootstrap-missing-ignite-toml.sh" \

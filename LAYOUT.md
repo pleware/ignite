@@ -44,7 +44,7 @@ Consumer after bootstrap:
 <workspace>/
 ├── mani.yaml                    # committed
 ├── mise.toml                    # committed
-├── ignite.toml                  # committed
+├── ignite.toml                  # committed ([kit] pin optional)
 └── .ignite/                     # gitignored
     ├── stack/mise/<PIN>/        # planted mise binary
     ├── mise/                    # MISE_DATA_DIR

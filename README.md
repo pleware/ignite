@@ -25,7 +25,7 @@ directory for the working copy.
 <workspace>/
   mani.yaml                 # repo registry (optional clones)
   mise.toml                 # language pins (mise)
-  ignite.toml               # ignite policy — commit this
+  ignite.toml               # ignite policy — commit this ([kit] pin for a fleet)
   workspace-layout.yaml     # optional workspace-tree document (kinds are data)
   .ignite/                  # working copy / planted toolchain — gitignore this
 ```

@@ -4,6 +4,11 @@
 # Postgres/Redis: Compose in the consumer tree. LiteLLM: hosted externally.
 #
 # Layout is a document, not a kit profile. Kinds live in the YAML.
+# [kit] pin is the git ref agentize clones when this machine has no kit yet.
+
+[kit]
+pin = "main"
+# url = "https://github.com/pleware/ignite.git"
 
 [workspace-tree]
 file = "workspace-layout.yaml"
