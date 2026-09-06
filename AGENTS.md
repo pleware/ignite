@@ -22,7 +22,9 @@ tests). LiteLLM is hosted externally (URL + credentials) — not Compose, not
 a toolchain binary.
 
 Intelephense and PHPantom are not ignite plants. PHP products pin them in
-**their** `mise.toml`. Agentize only names the command in `agentize.yaml`.
+**their** `mise.toml`. Agentize names the command and, on `run --agent`,
+calls `ensure.sh` so mise installs those pins. Do not clone `mani.yaml`
+from that path.
 
 Graphify is a consumer pin (`pipx:graphifyy` in `mise.toml`), not an ignite
 plant. Every product that uses the kit should pin it.

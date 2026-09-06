@@ -16,8 +16,10 @@ tree and not `.ignite/`.
 ignite/                          # this repository
 ├── README.md
 ├── LAYOUT.md
-├── bootstrap.sh                 # git + curl → mise → mise install
+├── bootstrap.sh                 # git + curl → clones → mise → mise install
 ├── bootstrap.ps1                # Windows: Git Bash wrapper
+├── ensure.sh                    # mise only — no mani clones
+├── ensure.ps1                   # Windows: Git Bash wrapper
 ├── workspace-tree.sh            # analyze / init a consumer kind YAML
 ├── workspace-tree.ps1
 ├── layout.sh                    # alias → workspace-tree.sh
@@ -25,6 +27,7 @@ ignite/                          # this repository
 ├── schema/layout.v1.json        # ignite.workspace-tree/1 — verbs, not kinds
 ├── pins/
 │   ├── toolchain.sh             # PIN_MISE only
+│   ├── ensure-toolchain.sh      # plant mise + mise install (no clones)
 │   ├── resolve-workspace.sh     # cwd / $1 / IGNITE_WORKSPACE
 │   ├── read-ignite-toml.sh      # ignite.toml
 │   ├── read-mani.sh             # mani.yaml clone targets

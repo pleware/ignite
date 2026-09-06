@@ -101,6 +101,10 @@ A generic pack: [`examples/layouts/minimal.yaml`](examples/layouts/minimal.yaml)
 4. `mise trust` + `mise install` from `mise.toml`.
 5. `workspace-tree.sh analyze` / `init` against a consumer kind document.
 
+`ensure.sh` (Windows: `ensure.ps1`) is steps 3–4 only — no `mani.yaml` clones.
+Pass extra tool names after the workspace path (`php@7.4`) when a slug needs
+a pin that is not the default in `mise.toml`. Agentize calls this on `run`.
+
 Not in v0: Python `doctor` / TUI, git hooks, inspiration clones.
 Not in this kit: Docker, Postgres, Redis, LiteLLM, or any service plant.
 Local containers are Compose-only in the consumer tree. LiteLLM is hosted
