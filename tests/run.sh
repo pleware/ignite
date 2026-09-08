@@ -5,16 +5,9 @@ set -eu
 ROOT=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
 fail=0
 for t in \
-	"$ROOT/test-read-ignite-toml.sh" \
-	"$ROOT/test-read-ignite-toml-layout.sh" \
-	"$ROOT/test-read-ignite-toml-kit.sh" \
-	"$ROOT/test-read-mani.sh" \
 	"$ROOT/test-resolve-workspace.sh" \
-	"$ROOT/test-bootstrap-missing-ignite-toml.sh" \
-	"$ROOT/test-ensure.sh" \
-	"$ROOT/test-ensure-tools.sh" \
-	"$ROOT/test-read-layout.sh" \
-	"$ROOT/test-layout-init-analyze.sh"; do
+	"$ROOT/test-trampoline-uv.sh" \
+	"$ROOT/test-engine-python.sh"; do
 	echo "run: $t"
 	if ! sh "$t"; then
 		echo "FAIL: $t" >&2

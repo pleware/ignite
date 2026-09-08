@@ -1,13 +1,14 @@
-# Find Git Bash and run the POSIX workspace-tree command. No install logic here.
+# Apply or check a workspace-tree document. Thin trampoline: plant the pinned
+# uv, then hand off to the Python engine's `workspace-tree` verb.
+# Usage: .\workspace-tree.ps1 analyze|init [--tree FILE] [--kind KIND] [--dest DIR] [--parent-kind KIND] [workspace]
 $ErrorActionPreference = "Stop"
-$here = Split-Path -Parent $MyInvocation.MyCommand.Path
-$bashCandidates = @(
-    "$env:ProgramFiles\Git\bin\bash.exe",
-    "${env:ProgramFiles(x86)}\Git\bin\bash.exe"
-)
-$bash = $bashCandidates | Where-Object { Test-Path $_ } | Select-Object -First 1
-if (-not $bash) {
-    Write-Error "Git Bash not found. Install Git for Windows and retry."
+$KIT_ROOT = Split-Path -Parent $MyInvocation.MyCommand.Path
+. (Join-Path $KIT_ROOT "pins/bootstrap.ps1")
+
+# workspace-tree may run without a workspace (--tree/--kind/--dest). Resolve
+# one only if it is available; the engine re-resolves authoritatively.
+$script:WORKSPACE_ROOT = ""
+if ($env:IGNITE_WORKSPACE) {
+    try { $script:WORKSPACE_ROOT = Resolve-IgniteWorkspaceRoot $env:IGNITE_WORKSPACE } catch { }
 }
-& $bash (Join-Path $here "workspace-tree.sh") @args
-exit $LASTEXITCODE
+run_ignite workspace-tree @args

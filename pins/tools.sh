@@ -9,8 +9,15 @@
 #   TOOL_<KEY>_ROOT_MARKER   optional workspace file to receive the scan root (.)
 #
 # Keep PIN_UV in sync with an astral-sh/uv release tag (no leading v).
+# PIN_PYTHON is the engine's own interpreter: uv fetches this standalone
+# CPython on first run, so a machine needs no preinstalled Python.
+# PIN_UV_SHA256 is the sha256 of the uv release archive; leave empty to skip
+# verification until a fleet pins a real checksum.
 
 PIN_UV=0.12.3
+PIN_PYTHON=3.12.11
+PIN_UV_SHA256=
+
 PIN_GRAPHIFYY=0.9.51
 
 EXTRA_TOOL_KEYS="GRAPHIFYY"

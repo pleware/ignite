@@ -13,8 +13,12 @@ This repository is the **kit**. A company workspace (binder, MassTrade,
 initagent, …) is the **consumer**. Ignite does not live inside that tree as
 a nested `*-developer` folder.
 
-Chicken-egg: first plant needs **git + curl** (Windows: Git Bash). Not
-system Go, Python, or Node. Mani and mise are outputs of bootstrap, not
+Chicken-egg: first plant needs **git + curl** (Windows: Git Bash). The
+engine itself is Python, but it never needs a preinstalled Python —
+`ensure.sh` / `bootstrap.sh` curl the pinned static `uv` (layer 1), verify
+its checksum, then run the engine as a plain script on a pinned standalone
+CPython (`uv venv`, no build backend, no PyPI fetch beyond Python). Not
+system Go, Python, or Node. Mani, mise, and uv are outputs of bootstrap, not
 inputs.
 
 ## Consumer layout
@@ -122,6 +126,8 @@ fleet, or something has to know the path of the interpreter the tool runs on.
 
 ```sh
 PIN_UV=0.12.3
+PIN_PYTHON=3.12.11   # the engine's own interpreter (uv fetches it)
+PIN_UV_SHA256=       # empty until a fleet pins a real checksum
 PIN_GRAPHIFYY=0.9.51
 
 EXTRA_TOOL_KEYS="GRAPHIFYY"
@@ -144,6 +150,26 @@ not to the consuming repo.
 
 The pin is the kit's, not the consumer's: bumping `graphifyy` for a fleet is
 one commit here plus a `[kit] pin` bump in each `ignite.toml`.
+
+## Runtime extensions
+
+A runtime is one thing; the libraries and binary extensions loaded *into* it
+are another. `php@8.4` is a mise tool; `imagick` is not. Ignite reads a
+`[runtime-extensions]` table in `ignite.toml` and applies it during `ensure`,
+after `mise install`:
+
+```toml
+# ignite.toml
+[runtime-extensions]
+"php@8.4" = ["imagick", "pcntl", "redis"]
+```
+
+Each entry resolves to a per-OS recipe (Linux: `pecl` / `apt`; Windows: a
+DLL + ImageMagick). An extension with no recipe on the current OS falls back
+to the runtime's built-in (GD is compiled into PHP) and is logged, never
+merged into the `TOOL_*` fleet pins. `runtime-extensions` and `TOOL_*` stay
+two separate keys: one is binaries the product's code needs, the other is
+fleet-pinned CLI tools.
 
 ## Workspace tree
 
@@ -176,14 +202,20 @@ A generic pack: [`examples/layouts/minimal.yaml`](examples/layouts/minimal.yaml)
 
 ## What v0 does
 
+The shell trampoline plants the pinned `uv` first (layer 1, checksum via
+`PIN_UV_SHA256`); the Python engine then runs the verb:
+
 1. Require `ignite.toml`. Cache is always `.ignite/`.
-2. Clone `mani.yaml` projects with `sync: true` (`required` tag fails hard).
+2. Clone `mani.yaml` projects with `sync: true` (`required` tag fails hard)
+   — `bootstrap` only.
 3. Plant the mise binary (`pins/toolchain.sh` → `PIN_MISE`).
 4. `mise trust` + `mise install` from `mise.toml`.
-5. Plant the CLI pins in `pins/tools.sh` with `uv` (`PIN_UV`).
-6. `workspace-tree.sh analyze` / `init` against a consumer kind document.
+5. Apply `[runtime-extensions]` (per-OS recipe; GD is the fallback).
+6. Plant the CLI pins in `pins/tools.sh` with `uv` (`PIN_UV`).
+7. `uv sync` the workspace's own lockfile (layer 2).
+8. `workspace-tree.sh analyze` / `init` against a consumer kind document.
 
-`ensure.sh` is steps 3–5 only. Agentize `run --agent` calls it.
+`ensure.sh` is steps 3–7 only. Agentize `run --agent` calls it.
 
 Not in v0: Python `doctor` / TUI, git hooks, inspiration clones.
 Not in this kit: Docker, Postgres, Redis, LiteLLM, or any service plant.

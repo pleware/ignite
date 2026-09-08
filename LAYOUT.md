@@ -16,26 +16,24 @@ tree and not `.ignite/`.
 ignite/                          # this repository
 ├── README.md
 ├── LAYOUT.md
-├── bootstrap.sh                 # git + curl → clones → mise → mise install
-├── bootstrap.ps1                # Windows: Git Bash wrapper
-├── ensure.sh                    # mise only — no mani clones
-├── ensure.ps1                   # Windows: Git Bash wrapper
-├── workspace-tree.sh            # analyze / init a consumer kind YAML
-├── workspace-tree.ps1
+├── bootstrap.sh                 # trampoline: curl pinned uv → run engine
+├── bootstrap.ps1                # PowerShell trampoline (same, native)
+├── ensure.sh                    # trampoline: engine `ensure` (no clones)
+├── ensure.ps1                   # PowerShell trampoline (same, native)
+├── workspace-tree.sh            # trampoline: engine `workspace-tree`
+├── workspace-tree.ps1           # PowerShell trampoline (same, native)
 ├── layout.sh                    # alias → workspace-tree.sh
 ├── layout.ps1                   # alias → workspace-tree.ps1
 ├── schema/layout.v1.json        # ignite.workspace-tree/1 — verbs, not kinds
 ├── pins/
-│   ├── toolchain.sh             # PIN_MISE only
-│   ├── ensure-toolchain.sh      # plant mise + mise install (no clones)
+│   ├── toolchain.sh             # PIN_MISE
+│   ├── tools.sh                 # PIN_UV, PIN_PYTHON, PIN_UV_SHA256, TOOL_*
 │   ├── resolve-workspace.sh     # cwd / $1 / IGNITE_WORKSPACE
-│   ├── read-ignite-toml.sh      # ignite.toml
-│   ├── read-mani.sh             # mani.yaml clone targets
-│   ├── workspace-paths.sh       # .ignite/ (or IGNITE_TOOLCHAIN_ROOT)
-│   ├── read-layout.sh           # workspace-tree YAML → directory dump
-│   └── layout-apply.sh          # analyze / init
+│   ├── bootstrap.sh             # plant_uv + run_ignite (the sh trampoline)
+│   └── bootstrap.ps1            # plant_uv + run_ignite (the ps1 trampoline)
+├── src/ignite/                  # the Python engine — single source of logic
 ├── env/
-│   └── env.sh                   # eval-able PATH / MISE_DATA_DIR / GOCACHE
+│   └── env.sh                   # trampoline: engine `env` (eval-able PATH)
 ├── examples/workspace/          # copy these files to a consumer
 ├── examples/layouts/            # generic kind pack (not pware kinds)
 └── tests/
@@ -49,8 +47,11 @@ Consumer after bootstrap:
 ├── mise.toml                    # committed
 ├── ignite.toml                  # committed ([kit] pin optional)
 └── .ignite/                     # gitignored
+    ├── stack/uv/<PIN>/          # planted uv (layer 1 — the engine's host)
     ├── stack/mise/<PIN>/        # planted mise binary
     ├── mise/                    # MISE_DATA_DIR
+    ├── venv/                    # the engine's pinned CPython environment
+    ├── uv-tools/                # TOOL_* environments (uv tool install)
     └── cache/go/
 ```
 

@@ -1,5 +1,5 @@
 #!/bin/sh
-# Workspace detection and toolchain resolve from config.
+# Workspace detection from $1, IGNITE_WORKSPACE, then cwd.
 set -eu
 
 KIT=$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)
@@ -22,12 +22,5 @@ got=$(
 )
 want=$(CDPATH= cd -- "$KIT/examples/workspace" && pwd)
 test "$got" = "$want"
-
-KIT_ROOT=$KIT
-WORKSPACE_ROOT=$want
-# shellcheck disable=SC1091
-. "$KIT/pins/workspace-paths.sh"
-root=$(resolve_toolchain_root)
-test "$root" = "$WORKSPACE_ROOT/.ignite"
 
 echo "resolve-workspace: ok"
