@@ -3,3 +3,11 @@ Thumbs.db
 *.log
 .env
 .env.*
+
+# Python (engine) build / bytecode artifacts.
+__pycache__/
+*.pyc
+.venv/
+build/
+dist/
+*.egg-info/

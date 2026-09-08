@@ -10,11 +10,12 @@ Language pins belong in the consumer `mise.toml`. Ignite policy belongs in
 (and `url`) is the git ref a consumer or agentize clones when the kit is
 missing on this machine. Do not float `main` on a fleet — pin a commit.
 
-Workspace-tree kinds are not part of this kit. The engine is
-`workspace-tree.sh` plus `schema/layout.v1.json`. A consumer commits its
-own `workspace-layout.yaml` (or any path in `[workspace-tree] file`).
-`layout.sh`, `[layout]`, and `ignite.layout/1` are aliases. Do not add
-binder / workspace / product as built-in profiles.
+Workspace-tree kinds are not part of this kit. The workspace-tree verbs
+live in the Python engine (`src/ignite/workspace_tree.py`, invoked through
+the `workspace-tree.sh` trampoline) plus `schema/layout.v1.json`. A consumer
+commits its own `workspace-layout.yaml` (or any path in `[workspace-tree]
+file`). `layout.sh`, `[layout]`, and `ignite.layout/1` are aliases. Do not
+add binder / workspace / product as built-in profiles.
 
 Ignite does not plant Docker, Postgres, Redis, LiteLLM, or other services.
 Postgres and Redis may run in the consumer's **Compose** (Horizon, infra-dev,
