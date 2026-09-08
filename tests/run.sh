@@ -12,6 +12,7 @@ for t in \
 	"$ROOT/test-resolve-workspace.sh" \
 	"$ROOT/test-bootstrap-missing-ignite-toml.sh" \
 	"$ROOT/test-ensure.sh" \
+	"$ROOT/test-ensure-tools.sh" \
 	"$ROOT/test-read-layout.sh" \
 	"$ROOT/test-layout-init-analyze.sh"; do
 	echo "run: $t"

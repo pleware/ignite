@@ -6,7 +6,8 @@
 
 Workspace toolchain bootstrapper. It plants [mise](https://mise.jdx.dev),
 then mise plants languages and [mani](https://github.com/alajmo/mani) from
-the consuming workspace's `mise.toml`. It is not OpenCode ([agentize](https://github.com/pleware/agentize)).
+the consuming workspace's `mise.toml`. It is not an agent host
+([agentize](https://github.com/pleware/agentize) calls this kit).
 
 This repository is the **kit**. A company workspace (binder, MassTrade,
 initagent, …) is the **consumer**. Ignite does not live inside that tree as
@@ -64,6 +65,86 @@ mani --version
 `.gitignore` on the consumer: `.ignite/` (the whole working copy). Policy
 stays in `ignite.toml`.
 
+## Kit pin
+
+The kit is this git repo. The consumer does not vendor it. A fleet machine
+that has never seen ignite clones the ref in `[kit]`:
+
+```toml
+[kit]
+pin = "fee062f"
+# url defaults to https://github.com/pleware/ignite.git
+```
+
+`pin` is required when the section is present. Do not float `main` on a
+fleet — twenty machines would drift. Agentize reads the same keys and clones
+into `~/.agentize/ignite/<pin>/` (or `$AGENTIZE_HOME`).
+
+## Ensure (no clones)
+
+`bootstrap.sh` clones `mani.yaml` siblings, then plants mise. A bot start
+must not clone the rest of the company.
+
+```sh
+sh /path/to/ignite/ensure.sh /path/to/workspace
+sh /path/to/ignite/ensure.sh /path/to/workspace php@7.4 phpantom
+```
+
+Windows: `.\ensure.ps1` with the same arguments.
+
+That is plant mise + `mise trust` + `mise install` from `mise.toml`. Extra
+names after the workspace path install a pin that is not the default
+(`php@7.4` next to `php@8.3`). Two versions in one checkout is a
+`mise.toml` choice:
+
+```toml
+# mise.toml
+[tools]
+"php@7.4" = "7.4.33"
+"php@8.3" = "8.3.6"
+```
+
+PATH afterwards:
+
+```sh
+eval "$(sh /path/to/ignite/env/env.sh)"
+```
+
+## Pinned CLI tools (kit-owned)
+
+A PyPI console script that one workspace needs is a `mise.toml` line
+(`"pipx:<package>" = "<version>"`). Two things move a tool out of the
+consumer and into the kit: the pin has to be the same on every machine of a
+fleet, or something has to know the path of the interpreter the tool runs on.
+
+[`pins/tools.sh`](pins/tools.sh) holds those, and `bootstrap.sh` /
+`ensure.sh` plant them with `uv` after `mise install`:
+
+```sh
+PIN_UV=0.12.3
+PIN_GRAPHIFYY=0.9.51
+
+EXTRA_TOOL_KEYS="GRAPHIFYY"
+TOOL_GRAPHIFYY_SPEC="graphifyy[ollama,sql]==$PIN_GRAPHIFYY"
+TOOL_GRAPHIFYY_ENV=graphifyy
+TOOL_GRAPHIFYY_PYTHON_MARKER=graphify-out/.graphify_python
+TOOL_GRAPHIFYY_ROOT_MARKER=graphify-out/.graphify_root
+```
+
+Environments land in `.ignite/uv-tools/<TOOL_*_ENV>`, launchers in
+`.ignite/uv-tools/bin` (on PATH via `env/env.sh`). A tool whose
+`uv-receipt.toml` already names the pinned version is skipped, so a second
+run is a no-op.
+
+`TOOL_*_PYTHON_MARKER` and `TOOL_*_ROOT_MARKER` are optional workspace-
+relative files that receive the environment's interpreter and the scan root
+(`.`). They exist because a consumer's git hooks need to find that
+interpreter without the launcher on PATH — the discovery belongs to the kit,
+not to the consuming repo.
+
+The pin is the kit's, not the consumer's: bumping `graphifyy` for a fleet is
+one commit here plus a `[kit] pin` bump in each `ignite.toml`.
+
 ## Workspace tree
 
 Ignite does not ship binder / workspace / product profiles. It implements
@@ -74,7 +155,7 @@ YAML document the consumer writes. Anyone can ship their own file.
 `ignite.layout/1`, `[layout]`, `--layout`, and `layout.sh` are aliases.
 
 ```toml
-# ignite.toml
+# ignite.toml — [kit] is documented above
 [workspace-tree]
 file = "workspace-layout.yaml"
 kind = "notes"
@@ -99,11 +180,10 @@ A generic pack: [`examples/layouts/minimal.yaml`](examples/layouts/minimal.yaml)
 2. Clone `mani.yaml` projects with `sync: true` (`required` tag fails hard).
 3. Plant the mise binary (`pins/toolchain.sh` → `PIN_MISE`).
 4. `mise trust` + `mise install` from `mise.toml`.
-5. `workspace-tree.sh analyze` / `init` against a consumer kind document.
+5. Plant the CLI pins in `pins/tools.sh` with `uv` (`PIN_UV`).
+6. `workspace-tree.sh analyze` / `init` against a consumer kind document.
 
-`ensure.sh` (Windows: `ensure.ps1`) is steps 3–4 only — no `mani.yaml` clones.
-Pass extra tool names after the workspace path (`php@7.4`) when a slug needs
-a pin that is not the default in `mise.toml`. Agentize calls this on `run`.
+`ensure.sh` is steps 3–5 only. Agentize `run --agent` calls it.
 
 Not in v0: Python `doctor` / TUI, git hooks, inspiration clones.
 Not in this kit: Docker, Postgres, Redis, LiteLLM, or any service plant.

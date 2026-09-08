@@ -1,5 +1,6 @@
 #!/bin/sh
-# Plant mise and `mise install` from mise.toml. No mani clones.
+# Plant mise and `mise install` from mise.toml, then the CLI pins in
+# pins/tools.sh. No mani clones.
 # Usage: sh ensure.sh [workspace] [tool ...]
 # Extra tools (php@7.4) are installed after the file pins.
 set -eu
@@ -9,11 +10,15 @@ KIT_ROOT=$SCRIPT_DIR
 # shellcheck disable=SC1091
 . "$KIT_ROOT/pins/toolchain.sh"
 # shellcheck disable=SC1091
+. "$KIT_ROOT/pins/tools.sh"
+# shellcheck disable=SC1091
 . "$KIT_ROOT/pins/resolve-workspace.sh"
 # shellcheck disable=SC1091
 . "$KIT_ROOT/pins/workspace-paths.sh"
 # shellcheck disable=SC1091
 . "$KIT_ROOT/pins/ensure-toolchain.sh"
+# shellcheck disable=SC1091
+. "$KIT_ROOT/pins/ensure-tools.sh"
 
 need_cmd() {
 	if ! command -v "$1" >/dev/null 2>&1; then
@@ -43,6 +48,7 @@ prepare_toolchain_dirs
 detect_platform
 plant_mise
 run_mise_install "$@"
+install_extra_tools
 
 echo "ensure: done. Next:"
 echo "  eval \"\$(sh $KIT_ROOT/env/env.sh)\""

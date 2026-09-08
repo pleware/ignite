@@ -1,6 +1,8 @@
 # Example consumer pins. Copy to the workspace root as mise.toml.
 # Ignite plants mise, then `mise install` reads this file.
-# Graphify (every product): PyPI package graphifyy; CLI is graphify.
+# A PyPI console script needed by one workspace goes here as
+# "pipx:<package>". One needed by the whole fleet belongs to the kit
+# instead — pins/tools.sh (graphify is pinned there).
 
 [settings.pipx]
 uvx = true
@@ -11,4 +13,3 @@ node = "22.12.0"
 python = "3.12.10"
 mani = "0.32.1"
 uv = "0.12.10"
-"pipx:graphifyy" = "0.9.55"

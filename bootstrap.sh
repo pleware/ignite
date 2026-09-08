@@ -11,6 +11,8 @@ KIT_ROOT=$SCRIPT_DIR
 # shellcheck disable=SC1091
 . "$KIT_ROOT/pins/toolchain.sh"
 # shellcheck disable=SC1091
+. "$KIT_ROOT/pins/tools.sh"
+# shellcheck disable=SC1091
 . "$KIT_ROOT/pins/resolve-workspace.sh"
 # shellcheck disable=SC1091
 . "$KIT_ROOT/pins/read-mani.sh"
@@ -18,6 +20,8 @@ KIT_ROOT=$SCRIPT_DIR
 . "$KIT_ROOT/pins/workspace-paths.sh"
 # shellcheck disable=SC1091
 . "$KIT_ROOT/pins/ensure-toolchain.sh"
+# shellcheck disable=SC1091
+. "$KIT_ROOT/pins/ensure-tools.sh"
 
 need_cmd() {
 	if ! command -v "$1" >/dev/null 2>&1; then
@@ -97,6 +101,7 @@ fi
 detect_platform
 plant_mise
 run_mise_install
+install_extra_tools
 
 echo "bootstrap: done. Next:"
 echo "  eval \"\$(sh $KIT_ROOT/env/env.sh)\""
