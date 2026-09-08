@@ -16,21 +16,21 @@ tree and not `.ignite/`.
 ignite/                          # this repository
 ├── README.md
 ├── LAYOUT.md
-├── bootstrap.sh                 # trampoline: curl pinned uv → uv run engine
-├── bootstrap.ps1                # Windows: Git Bash wrapper
+├── bootstrap.sh                 # trampoline: curl pinned uv → run engine
+├── bootstrap.ps1                # PowerShell trampoline (same, native)
 ├── ensure.sh                    # trampoline: engine `ensure` (no clones)
-├── ensure.ps1                   # Windows: Git Bash wrapper
+├── ensure.ps1                   # PowerShell trampoline (same, native)
 ├── workspace-tree.sh            # trampoline: engine `workspace-tree`
-├── workspace-tree.ps1
+├── workspace-tree.ps1           # PowerShell trampoline (same, native)
 ├── layout.sh                    # alias → workspace-tree.sh
 ├── layout.ps1                   # alias → workspace-tree.ps1
-├── pyproject.toml               # engine project (uv run --project)
 ├── schema/layout.v1.json        # ignite.workspace-tree/1 — verbs, not kinds
 ├── pins/
 │   ├── toolchain.sh             # PIN_MISE
 │   ├── tools.sh                 # PIN_UV, PIN_PYTHON, PIN_UV_SHA256, TOOL_*
 │   ├── resolve-workspace.sh     # cwd / $1 / IGNITE_WORKSPACE
-│   └── bootstrap.sh             # plant_uv + run_ignite (the trampoline)
+│   ├── bootstrap.sh             # plant_uv + run_ignite (the sh trampoline)
+│   └── bootstrap.ps1            # plant_uv + run_ignite (the ps1 trampoline)
 ├── src/ignite/                  # the Python engine — single source of logic
 ├── env/
 │   └── env.sh                   # trampoline: engine `env` (eval-able PATH)
