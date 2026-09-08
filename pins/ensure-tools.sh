@@ -116,6 +116,17 @@ _tool_env_python() {
 	return 1
 }
 
+# Git Bash hands us /f/work/repo, which only a POSIX shell can execute. The
+# marker is also read by PowerShell (Windows is the main dev host), so emit the
+# mixed form D:/work/repo — both shells run that.
+_native_path() {
+	if command -v cygpath >/dev/null 2>&1; then
+		cygpath -m -- "$1"
+	else
+		printf '%s\n' "$1"
+	fi
+}
+
 _write_marker() {
 	rel=$1
 	value=$2
@@ -136,7 +147,7 @@ _write_tool_markers() {
 	env_root="$(uv_tool_dir)/$env_dir"
 	if [ -n "$py_marker" ]; then
 		if py=$(_tool_env_python "$env_root"); then
-			_write_marker "$py_marker" "$py"
+			_write_marker "$py_marker" "$(_native_path "$py")"
 		else
 			echo "ignite: no interpreter under $env_root — skipped $py_marker" >&2
 		fi

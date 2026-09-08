@@ -51,6 +51,25 @@ test -f "$ws/$TOOL_GRAPHIFYY_PYTHON_MARKER"
 grep -q "uv-tools/$TOOL_GRAPHIFYY_ENV/bin/python" "$ws/$TOOL_GRAPHIFYY_PYTHON_MARKER"
 test "$(cat "$ws/$TOOL_GRAPHIFYY_ROOT_MARKER")" = "."
 
+# On Git Bash the marker must carry a path PowerShell can run too (D:/… , not
+# /d/…): the Twig helpers and the docs read this file from PowerShell.
+if command -v cygpath >/dev/null 2>&1; then
+	marker_value=$(cat "$ws/$TOOL_GRAPHIFYY_PYTHON_MARKER")
+	case "$marker_value" in
+		/[a-zA-Z]/*)
+			echo "ensure-tools: marker kept a POSIX path: $marker_value" >&2
+			exit 1
+			;;
+	esac
+	case "$marker_value" in
+		[a-zA-Z]:/*) ;;
+		*)
+			echo "ensure-tools: expected a drive-letter path, got: $marker_value" >&2
+			exit 1
+			;;
+	esac
+fi
+
 # Second run: the receipt already names the pin, so uv is not called again.
 : >"$uv_log"
 sh "$KIT/ensure.sh" "$ws" >"$tmp/out2" 2>"$tmp/err2"
