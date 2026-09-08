@@ -26,6 +26,17 @@ kcov \
 
 xml=$OUT/cobertura.xml
 if [ ! -f "$xml" ]; then
+	# kcov 38 reports under <out>/<script>.<hash>/, and leaves kcov-merged
+	# empty when it traced a single script. ci.yml and Codecov read the path
+	# below, so publish the report there.
+	for candidate in "$OUT/kcov-merged/cobertura.xml" $(find "$OUT" -name cobertura.xml -type f); do
+		if [ -f "$candidate" ]; then
+			cp "$candidate" "$xml"
+			break
+		fi
+	done
+fi
+if [ ! -f "$xml" ]; then
 	echo "coverage.sh: kcov wrote no $xml" >&2
 	exit 1
 fi
