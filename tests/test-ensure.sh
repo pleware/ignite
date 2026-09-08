@@ -5,6 +5,8 @@ set -eu
 KIT=$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)
 # shellcheck disable=SC1091
 . "$KIT/pins/toolchain.sh"
+# shellcheck disable=SC1091
+. "$KIT/pins/tools.sh"
 
 tmp=$(mktemp -d)
 trap 'rm -rf "$tmp"' EXIT
@@ -46,10 +48,23 @@ printf '%s\n' "\$*" >>"$log"
 EOF
 chmod +x "$IGNITE_TOOLCHAIN_ROOT/stack/mise/$PIN_MISE/bin/mise"
 
+# ensure.sh also plants the pins/tools.sh CLIs, which would reach PyPI. This
+# file is about mise, and run.sh promises no network, so stub uv away too.
+# What the pinned tools write is test-ensure-tools.sh.
+mkdir -p "$IGNITE_TOOLCHAIN_ROOT/stack/uv/$PIN_UV/bin"
+cat >"$IGNITE_TOOLCHAIN_ROOT/stack/uv/$PIN_UV/bin/uv" <<'EOF'
+#!/bin/sh
+exit 0
+EOF
+chmod +x "$IGNITE_TOOLCHAIN_ROOT/stack/uv/$PIN_UV/bin/uv"
+
 sh "$KIT/ensure.sh" "$ws" php@7.4 >"$tmp/out" 2>"$tmp/err"
 test ! -d "$ws/sibling"
 grep -q "trust " "$log"
-grep -q "^install$" "$log"
+# `mise install` with no tool argument. Anchoring the front would break under
+# kcov, which runs a `#!/bin/sh` stub as an argument to sh, so the stub sees
+# its own path ahead of the arguments it was called with.
+grep -qE '(^|[[:space:]])install$' "$log"
 grep -q "install php@7.4" "$log"
 
 if grep -qE 'clone_repo|git clone' "$KIT/ensure.sh"; then
