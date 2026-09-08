@@ -16,7 +16,8 @@ a nested `*-developer` folder.
 Chicken-egg: first plant needs **git + curl** (Windows: Git Bash). The
 engine itself is Python, but it never needs a preinstalled Python —
 `ensure.sh` / `bootstrap.sh` curl the pinned static `uv` (layer 1), verify
-its checksum, then `uv run` the engine on a pinned standalone CPython. Not
+its checksum, then run the engine as a plain script on a pinned standalone
+CPython (`uv venv`, no build backend, no PyPI fetch beyond Python). Not
 system Go, Python, or Node. Mani, mise, and uv are outputs of bootstrap, not
 inputs.
 

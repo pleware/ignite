@@ -4,7 +4,7 @@
 # The shell is the *bootstrap* language, not the engine. Its only job is to
 # turn git + curl into a Python interpreter, then hand off to the engine
 # (src/ignite/): curl the pinned `uv` (layer 1), verify its checksum when one
-# is pinned, and `uv run` the engine with the pinned CPython.
+# is pinned, and run the engine as a plain script on the pinned CPython.
 #
 # Expects KIT_ROOT and (optionally) WORKSPACE_ROOT to be set by the caller.
 # WORKSPACE_ROOT may be empty for workspace-less verbs (workspace-tree with
@@ -190,8 +190,45 @@ run_ignite() {
 	plant_uv
 	_uv=$(uv_binary)
 
-	export IGNITE_KIT_ROOT="$KIT_ROOT"
-	export IGNITE_UV="$_uv"
-	export UV_PROJECT_ENVIRONMENT="$TOOLCHAIN_ROOT/venv/ignite-$PIN_PYTHON"
-	exec "$_uv" run --project "$KIT_ROOT" --python "$PIN_PYTHON" ignite "$_verb" "$@"
+	# The engine is a plain script, not an installed package: `uv venv` on
+	# the pinned standalone CPython (fetched once, cached), then run that
+	# interpreter directly. No build backend, no PyPI fetch beyond Python.
+	_venv="$TOOLCHAIN_ROOT/venv/ignite-$PIN_PYTHON"
+	if [ -x "$_venv/bin/python3" ]; then
+		_py="$_venv/bin/python3"
+	elif [ -x "$_venv/Scripts/python.exe" ]; then
+		_py="$_venv/Scripts/python.exe"
+	else
+		"$_uv" venv --python "$PIN_PYTHON" "$_venv"
+		if [ -x "$_venv/bin/python3" ]; then
+			_py="$_venv/bin/python3"
+		elif [ -x "$_venv/Scripts/python.exe" ]; then
+			_py="$_venv/Scripts/python.exe"
+		else
+			echo "ignite: could not find python in $_venv" >&2
+			return 1
+		fi
+	fi
+
+	# Git Bash hands the engine (a Windows CPython) POSIX paths in env vars,
+	# but env *values* are not auto-converted (only argv is). Emit native
+	# F:\... paths for everything the engine reads so it never sees /f/... .
+	if [ "$go_os" = windows ] && command -v cygpath >/dev/null 2>&1; then
+		_kit_native=$(cygpath -w "$KIT_ROOT")
+		_uv_native=$(cygpath -w "$_uv")
+		_py_native=$(cygpath -w "$_py")
+		_pypath="$_kit_native/src"
+		_pysep=";"
+	else
+		_kit_native=$KIT_ROOT
+		_uv_native=$_uv
+		_py_native=$_py
+		_pypath="$KIT_ROOT/src"
+		_pysep=":"
+	fi
+
+	export IGNITE_KIT_ROOT="$_kit_native"
+	export IGNITE_UV="$_uv_native"
+	export PYTHONPATH="$_pypath${PYTHONPATH:+$_pysep$PYTHONPATH}"
+	exec "$_py_native" -m ignite "$_verb" "$@"
 }
