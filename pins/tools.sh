@@ -12,8 +12,9 @@
 
 PIN_UV=0.12.3
 PIN_GRAPHIFYY=0.9.51
+PIN_POSTGRES_MCP=0.1.0
 
-EXTRA_TOOL_KEYS="GRAPHIFYY"
+EXTRA_TOOL_KEYS="GRAPHIFYY POSTGRES_MCP"
 
 # graphify reads its own interpreter back from graphify-out/.graphify_python:
 # the git hooks probe that file first, so a machine without the launcher on
@@ -22,3 +23,7 @@ TOOL_GRAPHIFYY_SPEC="graphifyy[ollama,sql]==$PIN_GRAPHIFYY"
 TOOL_GRAPHIFYY_ENV=graphifyy
 TOOL_GRAPHIFYY_PYTHON_MARKER=graphify-out/.graphify_python
 TOOL_GRAPHIFYY_ROOT_MARKER=graphify-out/.graphify_root
+
+# postgres-mcp: read-only Postgres MCP. Not on PyPI yet, so pinned to a git tag.
+TOOL_POSTGRES_MCP_SPEC="git+https://github.com/pleware/postgres-mcp.git@v$PIN_POSTGRES_MCP"
+TOOL_POSTGRES_MCP_ENV=postgres-mcp
