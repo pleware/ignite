@@ -122,19 +122,19 @@ fleet, or something has to know the path of the interpreter the tool runs on.
 
 ```sh
 PIN_UV=0.12.3
-PIN_GRAPHIFYY=0.9.51
 
 EXTRA_TOOL_KEYS="GRAPHIFYY"
-TOOL_GRAPHIFYY_SPEC="graphifyy[ollama,sql]==$PIN_GRAPHIFYY"
+TOOL_GRAPHIFYY_SPEC="graphifyy[ollama,sql]"
 TOOL_GRAPHIFYY_ENV=graphifyy
 TOOL_GRAPHIFYY_PYTHON_MARKER=graphify-out/.graphify_python
 TOOL_GRAPHIFYY_ROOT_MARKER=graphify-out/.graphify_root
 ```
 
 Environments land in `.ignite/uv-tools/<TOOL_*_ENV>`, launchers in
-`.ignite/uv-tools/bin` (on PATH via `env/env.sh`). A tool whose
-`uv-receipt.toml` already names the pinned version is skipped, so a second
-run is a no-op.
+`.ignite/uv-tools/bin` (on PATH via `env/env.sh`). A pinned tool whose
+`uv-receipt.toml` names the version is skipped, so a second run is a no-op;
+`graphifyy` is deliberately unpinned (no `==`), so it refreshes to latest
+every run.
 
 `TOOL_*_PYTHON_MARKER` and `TOOL_*_ROOT_MARKER` are optional workspace-
 relative files that receive the environment's interpreter and the scan root

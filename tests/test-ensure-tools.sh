@@ -37,13 +37,13 @@ env_root="\$UV_TOOL_DIR/$TOOL_GRAPHIFYY_ENV"
 mkdir -p "\$env_root/bin"
 printf '#!/bin/sh\n' >"\$env_root/bin/python"
 chmod +x "\$env_root/bin/python"
-printf 'requirements = ["graphifyy==%s"]\n' "$PIN_GRAPHIFYY" >"\$env_root/uv-receipt.toml"
+printf 'requirements = ["graphifyy"]\n' >"\$env_root/uv-receipt.toml"
 EOF
 chmod +x "$IGNITE_TOOLCHAIN_ROOT/stack/uv/$PIN_UV/bin/uv"
 
 sh "$KIT/ensure.sh" "$ws" >"$tmp/out" 2>"$tmp/err"
 
-grep -q "tool install --force graphifyy\[ollama,sql\]==$PIN_GRAPHIFYY" "$uv_log"
+grep -q "tool install --force graphifyy\[ollama,sql\]" "$uv_log"
 grep -q "UV_TOOL_DIR=$IGNITE_TOOLCHAIN_ROOT/uv-tools" "$uv_log"
 
 # The interpreter marker is what the consuming repo's git hooks read.
@@ -70,14 +70,11 @@ if command -v cygpath >/dev/null 2>&1; then
 	esac
 fi
 
-# Second run: the receipt already names the pin, so uv is not called again.
+# Second run: an unpinned spec never matches a receipt, so uv reinstalls —
+# that is the "always latest" behaviour, not a skip.
 : >"$uv_log"
 sh "$KIT/ensure.sh" "$ws" >"$tmp/out2" 2>"$tmp/err2"
-if grep -q "tool install" "$uv_log"; then
-	echo "ensure-tools: expected the pinned tool to be skipped on re-run" >&2
-	exit 1
-fi
-grep -q "already at" "$tmp/out2"
+grep -q "tool install --force graphifyy\[ollama,sql\]" "$uv_log"
 
 # A workspace with no extra pins must not need uv at all.
 bare=$tmp/bare

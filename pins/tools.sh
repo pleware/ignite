@@ -11,15 +11,16 @@
 # Keep PIN_UV in sync with an astral-sh/uv release tag (no leading v).
 
 PIN_UV=0.12.3
-PIN_GRAPHIFYY=0.9.51
 PIN_POSTGRES_MCP=0.1.0
 
 EXTRA_TOOL_KEYS="GRAPHIFYY POSTGRES_MCP"
 
-# graphify reads its own interpreter back from graphify-out/.graphify_python:
-# the git hooks probe that file first, so a machine without the launcher on
-# PATH still rebuilds the graph.
-TOOL_GRAPHIFYY_SPEC="graphifyy[ollama,sql]==$PIN_GRAPHIFYY"
+# graphifyy floats to latest: no == pin, so ensure refreshes it every run
+# (a spec without == never matches a receipt). graphify reads its own
+# interpreter back from graphify-out/.graphify_python: the git hooks probe
+# that file first, so a machine without the launcher on PATH still rebuilds
+# the graph.
+TOOL_GRAPHIFYY_SPEC="graphifyy[ollama,sql]"
 TOOL_GRAPHIFYY_ENV=graphifyy
 TOOL_GRAPHIFYY_PYTHON_MARKER=graphify-out/.graphify_python
 TOOL_GRAPHIFYY_ROOT_MARKER=graphify-out/.graphify_root
