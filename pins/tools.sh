@@ -24,6 +24,8 @@ TOOL_GRAPHIFYY_SPEC="graphifyy[ollama,sql]"
 TOOL_GRAPHIFYY_ENV=graphifyy
 TOOL_GRAPHIFYY_PYTHON_MARKER=graphify-out/.graphify_python
 TOOL_GRAPHIFYY_ROOT_MARKER=graphify-out/.graphify_root
+# Same env as graphifyy: extractors import graphify.ids. Pin a tag, not main.
+TOOL_GRAPHIFYY_WITH="git+https://github.com/pleware/graphify-postpass.git@v0.1.0"
 
 # postgres-mcp: read-only Postgres MCP. Not on PyPI yet, so pinned to a git tag.
 TOOL_POSTGRES_MCP_SPEC="git+https://github.com/pleware/postgres-mcp.git@v$PIN_POSTGRES_MCP"

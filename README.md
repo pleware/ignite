@@ -128,7 +128,12 @@ TOOL_GRAPHIFYY_SPEC="graphifyy[ollama,sql]"
 TOOL_GRAPHIFYY_ENV=graphifyy
 TOOL_GRAPHIFYY_PYTHON_MARKER=graphify-out/.graphify_python
 TOOL_GRAPHIFYY_ROOT_MARKER=graphify-out/.graphify_root
+TOOL_GRAPHIFYY_WITH="git+https://github.com/pleware/graphify-postpass.git@v0.1.0"
 ```
+
+`TOOL_*_WITH` is an optional extra `uv tool install --with` (same environment).
+graphify-postpass writes Twig composition onto `graph.json` after Graphify's
+AST pass.
 
 Environments land in `.ignite/uv-tools/<TOOL_*_ENV>`, launchers in
 `.ignite/uv-tools/bin` (on PATH via `env/env.sh`). A pinned tool whose

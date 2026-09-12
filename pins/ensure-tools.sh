@@ -201,7 +201,12 @@ install_extra_tools() {
 			continue
 		fi
 		echo "ignite: uv tool install $spec → $UV_TOOL_DIR"
-		"$uv_bin" tool install --force "$spec"
+		eval "with=\${TOOL_${key}_WITH:-}"
+		if [ -n "$with" ]; then
+			"$uv_bin" tool install --force --with "$with" "$spec"
+		else
+			"$uv_bin" tool install --force "$spec"
+		fi
 		_write_tool_markers "$key"
 	done
 	echo "ignite: extra tools done"

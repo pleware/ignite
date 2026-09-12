@@ -43,7 +43,7 @@ chmod +x "$IGNITE_TOOLCHAIN_ROOT/stack/uv/$PIN_UV/bin/uv"
 
 sh "$KIT/ensure.sh" "$ws" >"$tmp/out" 2>"$tmp/err"
 
-grep -q "tool install --force graphifyy\[ollama,sql\]" "$uv_log"
+grep -q "tool install --force --with git+https://github.com/pleware/graphify-postpass.git@v0.1.0 graphifyy\[ollama,sql\]" "$uv_log"
 grep -q "UV_TOOL_DIR=$IGNITE_TOOLCHAIN_ROOT/uv-tools" "$uv_log"
 
 # The interpreter marker is what the consuming repo's git hooks read.
@@ -74,7 +74,7 @@ fi
 # that is the "always latest" behaviour, not a skip.
 : >"$uv_log"
 sh "$KIT/ensure.sh" "$ws" >"$tmp/out2" 2>"$tmp/err2"
-grep -q "tool install --force graphifyy\[ollama,sql\]" "$uv_log"
+grep -q "tool install --force --with git+https://github.com/pleware/graphify-postpass.git@v0.1.0 graphifyy\[ollama,sql\]" "$uv_log"
 
 # A workspace with no extra pins must not need uv at all.
 bare=$tmp/bare
