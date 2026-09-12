@@ -133,7 +133,13 @@ TOOL_GRAPHIFYY_WITH="git+https://github.com/pleware/graphify-postpass.git@v0.1.0
 
 `TOOL_*_WITH` is an optional extra `uv tool install --with` (same environment).
 graphify-postpass writes Twig composition onto `graph.json` after Graphify's
-AST pass.
+AST pass. A second companion, [graphify-workspace](https://github.com/pleware/graphify-workspace),
+merges per-checkout graphs for an umbrella. Membership is a `graphify:` key
+on the consumer `mani.yaml` (project keys, sibling registries, and optional
+`backend` / `model` for Markdown). The API key is not in that file. The
+mani CLI ignores unknown fields. Do not plant a host path; do not add a
+sidecar yaml. Pin that kit on `TOOL_GRAPHIFYY_WITH` once it has a tag —
+until then run it from its checkout (`uv run --project … graphify-workspace`).
 
 Environments land in `.ignite/uv-tools/<TOOL_*_ENV>`, launchers in
 `.ignite/uv-tools/bin` (on PATH via `env/env.sh`). A pinned tool whose

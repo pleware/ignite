@@ -25,6 +25,9 @@ TOOL_GRAPHIFYY_ENV=graphifyy
 TOOL_GRAPHIFYY_PYTHON_MARKER=graphify-out/.graphify_python
 TOOL_GRAPHIFYY_ROOT_MARKER=graphify-out/.graphify_root
 # Same env as graphifyy: extractors import graphify.ids. Pin a tag, not main.
+# graphify-workspace (umbrella merge; membership is mani.yaml graphify:)
+# joins this --with when it has a release tag. Until then: uv run --project
+# the sibling checkout.
 TOOL_GRAPHIFYY_WITH="git+https://github.com/pleware/graphify-postpass.git@v0.1.0"
 
 # postgres-mcp: read-only Postgres MCP. Not on PyPI yet, so pinned to a git tag.

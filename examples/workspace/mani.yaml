@@ -23,3 +23,13 @@ projects:
     desc: Sample optional sibling
     tags: [ops]
     sync: true
+
+# Extra key — mani ignores it. graphify-workspace reads it.
+# backend / model pin the Markdown LLM (portable). The API key is not here.
+# graphify:
+#   backend: deepseek
+#   model: deepseek-v4-flash
+#   products: [workspace, product]
+#   workspaces:
+#     - path: ../other-workspace
+#       products: [workspace, product]
