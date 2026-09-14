@@ -10,3 +10,6 @@ Thumbs.db
 # agentize-generated skills: per-instance, mount re-emits them.
 .cursor/skills/agentize.auto.generated*
 .opencode/skills/agentize.auto.generated*
+
+# agentize-generated MCP config: per-instance, mount re-emits it.
+.cursor/mcp.json
