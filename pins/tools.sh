@@ -20,7 +20,16 @@ EXTRA_TOOL_KEYS="GRAPHIFYY POSTGRES_MCP"
 # interpreter back from graphify-out/.graphify_python: the git hooks probe
 # that file first, so a machine without the launcher on PATH still rebuilds
 # the graph.
-TOOL_GRAPHIFYY_SPEC="graphifyy[ollama,sql]"
+#
+# `openai`, not `ollama`: the Markdown pass runs on the backend pinned in the
+# consumer's `graphify.backend` (DeepSeek on our umbrellas), and DeepSeek rides
+# graphify's OpenAI-compatible client — the documented `openai` extra, "OpenAI /
+# OpenAI-compatible APIs". The `ollama` extra installs that same client and
+# nothing else, which is how this line read as if a local model were in use.
+# `openai` additionally carries tiktoken, and its failure modes are graceful:
+# ImportError or a blocked first-use download falls back to the chars/4
+# heuristic rather than failing the extract.
+TOOL_GRAPHIFYY_SPEC="graphifyy[openai,sql]"
 TOOL_GRAPHIFYY_ENV=graphifyy
 TOOL_GRAPHIFYY_PYTHON_MARKER=graphify-out/.graphify_python
 TOOL_GRAPHIFYY_ROOT_MARKER=graphify-out/.graphify_root

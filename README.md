@@ -124,7 +124,7 @@ fleet, or something has to know the path of the interpreter the tool runs on.
 PIN_UV=0.12.3
 
 EXTRA_TOOL_KEYS="GRAPHIFYY"
-TOOL_GRAPHIFYY_SPEC="graphifyy[ollama,sql]"
+TOOL_GRAPHIFYY_SPEC="graphifyy[openai,sql]"
 TOOL_GRAPHIFYY_ENV=graphifyy
 TOOL_GRAPHIFYY_PYTHON_MARKER=graphify-out/.graphify_python
 TOOL_GRAPHIFYY_ROOT_MARKER=graphify-out/.graphify_root
@@ -140,6 +140,12 @@ on the consumer `mani.yaml` (project keys, sibling registries, and optional
 mani CLI ignores unknown fields. Do not plant a host path; do not add a
 sidecar yaml. Pin that kit on `TOOL_GRAPHIFYY_WITH` once it has a tag —
 until then run it from its checkout (`uv run --project … graphify-workspace`).
+
+`openai` is not a backend choice, it is the client. DeepSeek, Gemini, Kimi,
+Ollama and OpenAI all travel graphify's OpenAI-compatible path, and `ollama`
+used to be the extra that installed it — which read as if a local model were
+in use. `openai` names the client and adds `tiktoken` for accurate token
+counts.
 
 Environments land in `.ignite/uv-tools/<TOOL_*_ENV>`, launchers in
 `.ignite/uv-tools/bin` (on PATH via `env/env.sh`). A pinned tool whose
