@@ -7,7 +7,9 @@
 Workspace toolchain bootstrapper. It plants [mise](https://mise.jdx.dev),
 then mise plants languages and [mani](https://github.com/alajmo/mani) from
 the consuming workspace's `mise.toml`. It is not an agent host
-([agentize](https://github.com/pleware/agentize) calls this kit).
+([agentize](https://github.com/pleware/agentize) calls this kit), and it
+does not decide which skills may fire
+([skillize](https://github.com/pleware/skillize) does that).
 
 This repository is the **kit**. A company workspace (binder, MassTrade,
 initagent, …) is the **consumer**. Ignite does not live inside that tree as
