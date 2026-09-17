@@ -119,50 +119,34 @@ A PyPI console script that one workspace needs is a `mise.toml` line
 consumer and into the kit: the pin has to be the same on every machine of a
 fleet, or something has to know the path of the interpreter the tool runs on.
 
-[`pins/tools.sh`](pins/tools.sh) holds those, and `bootstrap.sh` /
-`ensure.sh` plant them with `uv` after `mise install`:
+[`pins/tools.sh`](pins/tools.sh) holds workspace-local tools such as
+`postgres-mcp`, and `bootstrap.sh` / `ensure.sh` plant them with `uv` after
+`mise install`. **Graphify is deliberately not one of them.** It is installed
+once in the user's system tool directory and shared by every workspace:
 
 ```sh
-PIN_UV=0.12.3
-
-EXTRA_TOOL_KEYS="GRAPHIFYY"
-TOOL_GRAPHIFYY_SPEC="graphifyy[openai,sql]"
-TOOL_GRAPHIFYY_ENV=graphifyy
-TOOL_GRAPHIFYY_PYTHON_MARKER=graphify-out/.graphify_python
-TOOL_GRAPHIFYY_ROOT_MARKER=graphify-out/.graphify_root
-TOOL_GRAPHIFYY_WITH="git+https://github.com/pleware/graphify-postpass.git@v0.1.0"
+uv tool install --force \
+  --with git+https://github.com/pleware/graphify-postpass.git@v0.1.0 \
+  "graphifyy[openai,sql,mcp]"
 ```
 
-`TOOL_*_WITH` is an optional extra `uv tool install --with` (same environment).
-graphify-postpass writes Twig composition onto `graph.json` after Graphify's
-AST pass. A second companion, [graphify-workspace](https://github.com/pleware/graphify-workspace),
-merges per-checkout graphs for an umbrella. Membership is a `graphify:` key
-on the consumer `mani.yaml` (project keys, sibling registries, and optional
-`backend` / `model` for Markdown). The API key is not in that file. The
-mani CLI ignores unknown fields. Do not plant a host path; do not add a
-sidecar yaml. Pin that kit on `TOOL_GRAPHIFYY_WITH` once it has a tag —
-until then run it from its checkout (`uv run --project … graphify-workspace`).
+That one environment owns `graphify`, `graphify-mcp` and graphify-postpass.
+Agent/MCP configs call those executables from PATH; a consumer must not pin
+`pipx:graphifyy` in `mise.toml`, use `uv run --with graphifyy`, or create a
+workspace `.ignite/uv-tools/graphifyy` copy.
 
-`openai` is not a backend choice, it is the client. DeepSeek, Gemini, Kimi,
-Ollama and OpenAI all travel graphify's OpenAI-compatible path, and `ollama`
-used to be the extra that installed it — which read as if a local model were
-in use. `openai` names the client and adds `tiktoken` for accurate token
-counts.
+[graphify-workspace](https://github.com/pleware/graphify-workspace) merges
+per-checkout graphs for an umbrella. Membership is a `graphify:` key on the
+consumer `mani.yaml` (project keys, sibling registries, and optional `backend` /
+`model` for Markdown). The API key is not in that file. The mani CLI ignores
+unknown fields. Do not plant a host path or add a sidecar yaml; run the merge
+kit from its checkout until it has a release.
 
-Environments land in `.ignite/uv-tools/<TOOL_*_ENV>`, launchers in
-`.ignite/uv-tools/bin` (on PATH via `env/env.sh`). A pinned tool whose
-`uv-receipt.toml` names the version is skipped, so a second run is a no-op;
-`graphifyy` is deliberately unpinned (no `==`), so it refreshes to latest
-every run.
-
-`TOOL_*_PYTHON_MARKER` and `TOOL_*_ROOT_MARKER` are optional workspace-
-relative files that receive the environment's interpreter and the scan root
-(`.`). They exist because a consumer's git hooks need to find that
-interpreter without the launcher on PATH — the discovery belongs to the kit,
-not to the consuming repo.
-
-The pin is the kit's, not the consumer's: bumping `graphifyy` for a fleet is
-one commit here plus a `[kit] pin` bump in each `ignite.toml`.
+Workspace-local tool environments still land in `.ignite/uv-tools/<TOOL_*_ENV>`
+and launchers in `.ignite/uv-tools/bin` (on PATH via `env/env.sh`). A pinned
+tool whose `uv-receipt.toml` names the version is skipped, so a second run is a
+no-op. `TOOL_*_PYTHON_MARKER` and `TOOL_*_ROOT_MARKER` remain available for
+future workspace-local tools that genuinely need them; Graphify does not.
 
 ## Workspace tree
 

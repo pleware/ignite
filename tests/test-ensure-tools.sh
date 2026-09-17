@@ -1,6 +1,6 @@
 #!/bin/sh
-# ensure.sh installs the pins/tools.sh CLIs through an already-present uv stub
-# and writes the workspace markers. No network, no real uv.
+# ensure.sh installs workspace-local CLI pins through an already-present uv stub.
+# Graphify is intentionally not one of them: it is a user/system CLI on PATH.
 set -eu
 
 KIT=$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)
@@ -25,56 +25,39 @@ exit 0
 EOF
 chmod +x "$IGNITE_TOOLCHAIN_ROOT/stack/mise/$PIN_MISE/bin/mise"
 
-# uv stub: record the arguments, then build the environment layout uv would
-# create so the marker step has something real to find.
+# uv stub: record the arguments and make the environment layout uv would create.
 uv_log=$tmp/uv.log
 mkdir -p "$IGNITE_TOOLCHAIN_ROOT/stack/uv/$PIN_UV/bin"
 cat >"$IGNITE_TOOLCHAIN_ROOT/stack/uv/$PIN_UV/bin/uv" <<EOF
 #!/bin/sh
 printf '%s\n' "\$*" >>"$uv_log"
 printf '%s\n' "UV_TOOL_DIR=\$UV_TOOL_DIR" >>"$uv_log"
-env_root="\$UV_TOOL_DIR/$TOOL_GRAPHIFYY_ENV"
+env_root="\$UV_TOOL_DIR/$TOOL_POSTGRES_MCP_ENV"
 mkdir -p "\$env_root/bin"
-printf '#!/bin/sh\n' >"\$env_root/bin/python"
-chmod +x "\$env_root/bin/python"
-printf 'requirements = ["graphifyy"]\n' >"\$env_root/uv-receipt.toml"
+printf 'requirements = ["postgres-mcp"]\n' >"\$env_root/uv-receipt.toml"
 EOF
 chmod +x "$IGNITE_TOOLCHAIN_ROOT/stack/uv/$PIN_UV/bin/uv"
 
 sh "$KIT/ensure.sh" "$ws" >"$tmp/out" 2>"$tmp/err"
 
-grep -q "tool install --force --with git+https://github.com/pleware/graphify-postpass.git@v0.1.0 graphifyy\[openai,sql\]" "$uv_log"
+grep -q "tool install --force git+https://github.com/pleware/postgres-mcp.git@v$PIN_POSTGRES_MCP" "$uv_log"
 grep -q "UV_TOOL_DIR=$IGNITE_TOOLCHAIN_ROOT/uv-tools" "$uv_log"
-
-# The interpreter marker is what the consuming repo's git hooks read.
-test -f "$ws/$TOOL_GRAPHIFYY_PYTHON_MARKER"
-grep -q "uv-tools/$TOOL_GRAPHIFYY_ENV/bin/python" "$ws/$TOOL_GRAPHIFYY_PYTHON_MARKER"
-test "$(cat "$ws/$TOOL_GRAPHIFYY_ROOT_MARKER")" = "."
-
-# On Git Bash the marker must carry a path PowerShell can run too (D:/… , not
-# /d/…): the Twig helpers and the docs read this file from PowerShell.
-if command -v cygpath >/dev/null 2>&1; then
-	marker_value=$(cat "$ws/$TOOL_GRAPHIFYY_PYTHON_MARKER")
-	case "$marker_value" in
-		/[a-zA-Z]/*)
-			echo "ensure-tools: marker kept a POSIX path: $marker_value" >&2
-			exit 1
-			;;
-	esac
-	case "$marker_value" in
-		[a-zA-Z]:/*) ;;
-		*)
-			echo "ensure-tools: expected a drive-letter path, got: $marker_value" >&2
-			exit 1
-			;;
-	esac
+if grep -qi graphify "$uv_log"; then
+  echo "ensure-tools: graphify must not be installed into a workspace tool dir" >&2
+  exit 1
 fi
+test ! -e "$ws/graphify-out/.graphify_python"
+test ! -e "$ws/graphify-out/.graphify_root"
 
-# Second run: an unpinned spec never matches a receipt, so uv reinstalls —
-# that is the "always latest" behaviour, not a skip.
+# Git specifications have no `==` version marker, so ensure refreshes the tool
+# on each run. It still must not install Graphify.
 : >"$uv_log"
 sh "$KIT/ensure.sh" "$ws" >"$tmp/out2" 2>"$tmp/err2"
-grep -q "tool install --force --with git+https://github.com/pleware/graphify-postpass.git@v0.1.0 graphifyy\[openai,sql\]" "$uv_log"
+grep -q "tool install --force git+https://github.com/pleware/postgres-mcp.git@v$PIN_POSTGRES_MCP" "$uv_log"
+if grep -qi graphify "$uv_log"; then
+  echo "ensure-tools: graphify must not be installed into a workspace tool dir" >&2
+  exit 1
+fi
 
 # A workspace with no extra pins must not need uv at all.
 bare=$tmp/bare
@@ -83,19 +66,19 @@ printf '# policy\n' >"$bare/ignite.toml"
 printf '[tools]\n' >"$bare/mise.toml"
 rm -rf "$IGNITE_TOOLCHAIN_ROOT/stack/uv"
 sh -c '
-	set -eu
-	KIT_ROOT=$1
-	ws=$2
-	. "$KIT_ROOT/pins/toolchain.sh"
-	. "$KIT_ROOT/pins/tools.sh"
-	. "$KIT_ROOT/pins/resolve-workspace.sh"
-	. "$KIT_ROOT/pins/workspace-paths.sh"
-	. "$KIT_ROOT/pins/ensure-toolchain.sh"
-	. "$KIT_ROOT/pins/ensure-tools.sh"
-	WORKSPACE_ROOT=$ws
-	prepare_toolchain_dirs
-	EXTRA_TOOL_KEYS=
-	install_extra_tools
+  set -eu
+  KIT_ROOT=$1
+  ws=$2
+  . "$KIT_ROOT/pins/toolchain.sh"
+  . "$KIT_ROOT/pins/tools.sh"
+  . "$KIT_ROOT/pins/resolve-workspace.sh"
+  . "$KIT_ROOT/pins/workspace-paths.sh"
+  . "$KIT_ROOT/pins/ensure-toolchain.sh"
+  . "$KIT_ROOT/pins/ensure-tools.sh"
+  WORKSPACE_ROOT=$ws
+  prepare_toolchain_dirs
+  EXTRA_TOOL_KEYS=
+  install_extra_tools
 ' _ "$KIT" "$bare"
 test ! -d "$bare/graphify-out"
 

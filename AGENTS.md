@@ -26,5 +26,6 @@ Intelephense and PHPantom are not ignite plants. PHP products pin them in
 calls `ensure.sh` so mise installs those pins. Do not clone `mani.yaml`
 from that path.
 
-Graphify is a consumer pin (`pipx:graphifyy` in `mise.toml`), not an ignite
-plant. Every product that uses the kit should pin it.
+Graphify is a user/system CLI, installed once with `uv tool` and shared by
+every workspace. It is neither a consumer `mise.toml` pin nor an ignite plant;
+workspace policies call `graphify` and `graphify-mcp` from PATH.

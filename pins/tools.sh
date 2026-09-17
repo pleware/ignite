@@ -13,31 +13,11 @@
 PIN_UV=0.12.3
 PIN_POSTGRES_MCP=0.1.0
 
-EXTRA_TOOL_KEYS="GRAPHIFYY POSTGRES_MCP"
+EXTRA_TOOL_KEYS="POSTGRES_MCP"
 
-# graphifyy floats to latest: no == pin, so ensure refreshes it every run
-# (a spec without == never matches a receipt). graphify reads its own
-# interpreter back from graphify-out/.graphify_python: the git hooks probe
-# that file first, so a machine without the launcher on PATH still rebuilds
-# the graph.
-#
-# `openai`, not `ollama`: the Markdown pass runs on the backend pinned in the
-# consumer's `graphify.backend` (DeepSeek on our umbrellas), and DeepSeek rides
-# graphify's OpenAI-compatible client — the documented `openai` extra, "OpenAI /
-# OpenAI-compatible APIs". The `ollama` extra installs that same client and
-# nothing else, which is how this line read as if a local model were in use.
-# `openai` additionally carries tiktoken, and its failure modes are graceful:
-# ImportError or a blocked first-use download falls back to the chars/4
-# heuristic rather than failing the extract.
-TOOL_GRAPHIFYY_SPEC="graphifyy[openai,sql]"
-TOOL_GRAPHIFYY_ENV=graphifyy
-TOOL_GRAPHIFYY_PYTHON_MARKER=graphify-out/.graphify_python
-TOOL_GRAPHIFYY_ROOT_MARKER=graphify-out/.graphify_root
-# Same env as graphifyy: extractors import graphify.ids. Pin a tag, not main.
-# graphify-workspace (umbrella merge; membership is mani.yaml graphify:)
-# joins this --with when it has a release tag. Until then: uv run --project
-# the sibling checkout.
-TOOL_GRAPHIFYY_WITH="git+https://github.com/pleware/graphify-postpass.git@v0.1.0"
+# Graphify is deliberately absent. It is a user/system CLI shared by every
+# workspace (`uv tool install graphifyy[...]`), not a workspace toolchain pin.
+# Agent/MCP configs call `graphify` and `graphify-mcp` from PATH.
 
 # postgres-mcp: read-only Postgres MCP. Not on PyPI yet, so pinned to a git tag.
 TOOL_POSTGRES_MCP_SPEC="git+https://github.com/pleware/postgres-mcp.git@v$PIN_POSTGRES_MCP"
